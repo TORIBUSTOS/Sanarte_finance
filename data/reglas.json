@@ -1,0 +1,218 @@
+{
+  "version": "1.0",
+  "fecha_actualizacion": "2025-11-15",
+  "categorias": {
+    "Ingresos": {
+      "subcategorias": [
+        "Afiliados DEBIN",
+        "Pacientes Transferencia",
+        "Otros Ingresos"
+      ]
+    },
+    "Egresos": {
+      "subcategorias": [
+        "Prestadores",
+        "Sueldos",
+        "Impuestos",
+        "Comisiones Bancarias",
+        "Servicios",
+        "Gastos Operativos"
+      ]
+    }
+  },
+  "reglas": [
+    {
+      "patron": "credito debin",
+      "campo": "concepto",
+      "categoria": "Ingresos",
+      "subcategoria": "Afiliados DEBIN",
+      "confianza": 95,
+      "descripcion": "DEBIN recibido de afiliados"
+    },
+    {
+      "patron": "tipo_debin",
+      "campo": "detalle",
+      "categoria": "Ingresos",
+      "subcategoria": "Afiliados DEBIN",
+      "confianza": 95,
+      "descripcion": "DEBIN identificado en detalle"
+    },
+    {
+      "patron": "sanarte srl",
+      "campo": "detalle",
+      "categoria": "Ingresos",
+      "subcategoria": "Afiliados DEBIN",
+      "confianza": 90,
+      "descripcion": "Transferencia a SANARTE SRL"
+    },
+    {
+      "patron": "credito por transferencia",
+      "campo": "concepto",
+      "categoria": "Ingresos",
+      "subcategoria": "Pacientes Transferencia",
+      "confianza": 80,
+      "descripcion": "Transferencia recibida de pacientes"
+    },
+    {
+      "patron": "transferencia recibida",
+      "campo": "concepto",
+      "categoria": "Ingresos",
+      "subcategoria": "Pacientes Transferencia",
+      "confianza": 75,
+      "descripcion": "Transferencia recibida"
+    },
+    {
+      "patron": "transferencia por cbu",
+      "campo": "concepto",
+      "categoria": "Egresos",
+      "subcategoria": "Prestadores",
+      "confianza": 70,
+      "monto_minimo": 10000,
+      "descripcion": "Pago a prestadores por CBU"
+    },
+    {
+      "patron": "debito por pago sueldos",
+      "campo": "concepto",
+      "categoria": "Egresos",
+      "subcategoria": "Sueldos",
+      "confianza": 95,
+      "descripcion": "Pago de sueldos"
+    },
+    {
+      "patron": "procesamiento nomina",
+      "campo": "detalle",
+      "categoria": "Egresos",
+      "subcategoria": "Sueldos",
+      "confianza": 95,
+      "descripcion": "Procesamiento de nómina"
+    },
+    {
+      "patron": "impuesto",
+      "campo": "concepto",
+      "categoria": "Egresos",
+      "subcategoria": "Impuestos",
+      "confianza": 90,
+      "descripcion": "Impuestos generales"
+    },
+    {
+      "patron": "iva",
+      "campo": "concepto",
+      "categoria": "Egresos",
+      "subcategoria": "Impuestos",
+      "confianza": 95,
+      "descripcion": "IVA"
+    },
+    {
+      "patron": "iibb",
+      "campo": "concepto",
+      "categoria": "Egresos",
+      "subcategoria": "Impuestos",
+      "confianza": 95,
+      "descripcion": "Ingresos Brutos"
+    },
+    {
+      "patron": "percep",
+      "campo": "concepto",
+      "categoria": "Egresos",
+      "subcategoria": "Impuestos",
+      "confianza": 90,
+      "descripcion": "Percepciones impositivas"
+    },
+    {
+      "patron": "debitos y creditos",
+      "campo": "concepto",
+      "categoria": "Egresos",
+      "subcategoria": "Impuestos",
+      "confianza": 95,
+      "descripcion": "Impuesto a débitos y créditos"
+    },
+    {
+      "patron": "comis",
+      "campo": "concepto",
+      "categoria": "Egresos",
+      "subcategoria": "Comisiones Bancarias",
+      "confianza": 90,
+      "descripcion": "Comisiones bancarias"
+    },
+    {
+      "patron": "iva operacion",
+      "campo": "concepto",
+      "categoria": "Egresos",
+      "subcategoria": "Comisiones Bancarias",
+      "confianza": 85,
+      "descripcion": "IVA sobre operaciones bancarias"
+    },
+    {
+      "patron": "mantenimiento",
+      "campo": "concepto",
+      "categoria": "Egresos",
+      "subcategoria": "Comisiones Bancarias",
+      "confianza": 85,
+      "descripcion": "Comisión de mantenimiento"
+    },
+    {
+      "patron": "epec",
+      "campo": "detalle",
+      "categoria": "Egresos",
+      "subcategoria": "Servicios",
+      "confianza": 95,
+      "descripcion": "Servicio eléctrico EPEC"
+    },
+    {
+      "patron": "claro",
+      "campo": "detalle",
+      "categoria": "Egresos",
+      "subcategoria": "Servicios",
+      "confianza": 95,
+      "descripcion": "Servicio telefónico Claro"
+    },
+    {
+      "patron": "cablevision",
+      "campo": "detalle",
+      "categoria": "Egresos",
+      "subcategoria": "Servicios",
+      "confianza": 95,
+      "descripcion": "Servicio de cable"
+    },
+    {
+      "patron": "pago de servicios",
+      "campo": "concepto",
+      "categoria": "Egresos",
+      "subcategoria": "Servicios",
+      "confianza": 85,
+      "descripcion": "Pago de servicios generales"
+    },
+    {
+      "patron": "compra",
+      "campo": "concepto",
+      "categoria": "Egresos",
+      "subcategoria": "Gastos Operativos",
+      "confianza": 70,
+      "descripcion": "Compras varias"
+    },
+    {
+      "patron": "pedidosya",
+      "campo": "detalle",
+      "categoria": "Egresos",
+      "subcategoria": "Gastos Operativos",
+      "confianza": 80,
+      "descripcion": "Pedidos delivery"
+    },
+    {
+      "patron": "visa debito",
+      "campo": "concepto",
+      "categoria": "Egresos",
+      "subcategoria": "Gastos Operativos",
+      "confianza": 75,
+      "descripcion": "Compras con tarjeta de débito"
+    },
+    {
+      "patron": "descuento",
+      "campo": "concepto",
+      "categoria": "Ingresos",
+      "subcategoria": "Otros Ingresos",
+      "confianza": 70,
+      "descripcion": "Descuentos y promociones"
+    }
+  ]
+}

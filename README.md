@@ -1,5 +1,10 @@
 # SANARTE - Sistema de Control Financiero
 
+![Version](https://img.shields.io/badge/version-1.3-blue.svg)
+![Python](https://img.shields.io/badge/python-3.8+-brightgreen.svg)
+![Status](https://img.shields.io/badge/status-stable-success.svg)
+![Made with](https://img.shields.io/badge/made%20with-Python-1f425f.svg)
+
 Sistema automatizado para procesamiento de extractos bancarios de múltiples bancos.
 
 **Version:** 1.3 - Bloques 1, 2, 3 y 4 (Consolidador + Categorizador + Reportes + Orquestador CLI)

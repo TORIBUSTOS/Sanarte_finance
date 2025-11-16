@@ -232,7 +232,7 @@ def categorizar_movimientos(ruta_archivo_consolidado: str = None,
     print(f"\nArchivo generado: {ruta_salida}")
 
     # Estadísticas finales
-    total_clasificados = len(df_categorizado[df_categorizado['Categoria'] != 'Sin Clasificar'])
+    total_clasificados = len(df_categorizado[df_categorizado['Categoria_Principal'] != 'Sin Clasificar'])
     porcentaje = (total_clasificados / len(df_categorizado)) * 100
 
     print(f"\nEstadisticas finales:")

@@ -106,7 +106,7 @@ class Analyzer:
         """
         Calcula el saldo inicial y final del período.
 
-        Saldo Inicial = saldo del movimiento más antiguo (primera fecha)
+        Saldo Inicial = saldo ANTES del primer movimiento
         Saldo Final = saldo del movimiento más reciente (última fecha)
 
         Returns:
@@ -123,11 +123,18 @@ class Analyzer:
         # Ordenar por fecha
         df_ordenado = self.df.sort_values('Fecha')
 
-        # Saldo inicial: primer movimiento
-        saldo_inicial = df_ordenado.iloc[0]['Saldo']
-
-        # Saldo final: último movimiento
+        # Saldo final: último movimiento (DESPUÉS del último movimiento)
         saldo_final = df_ordenado.iloc[-1]['Saldo']
+
+        # Saldo inicial: ANTES del primer movimiento
+        # El saldo que aparece en el Excel es DESPUÉS del movimiento
+        # Entonces: Saldo_Antes = Saldo_Después - Crédito + Débito
+        primer_movimiento = df_ordenado.iloc[0]
+        saldo_despues_primer_mov = primer_movimiento['Saldo']
+        credito_primer_mov = primer_movimiento['Crédito'] if pd.notna(primer_movimiento['Crédito']) else 0
+        debito_primer_mov = primer_movimiento['Débito'] if pd.notna(primer_movimiento['Débito']) else 0
+
+        saldo_inicial = saldo_despues_primer_mov - credito_primer_mov + debito_primer_mov
 
         # Verificar si son NaN
         if pd.isna(saldo_inicial) or pd.isna(saldo_final):

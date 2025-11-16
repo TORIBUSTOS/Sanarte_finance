@@ -217,7 +217,7 @@ Fecha y hora: 15/11/2025 14:30:00
    - Para varios archivos: `1,2` o `1,3,4`
    - Para todos: `1,2,3,4`
 
-5. **Confirma tu selección** y el sistema procesará solo esos archivos
+5. El sistema procesará **automáticamente** los archivos seleccionados
 
 ### Ejemplo de Uso
 
@@ -231,9 +231,7 @@ ARCHIVOS SELECCIONADOS:
   - Extracto_Galicia_noviembre.xlsx
   - Extracto_Supervielle_noviembre.xlsx
 
-¿Confirmar selección? (S/N): S
-
-→ El sistema procesará SOLO los archivos de noviembre
+→ El sistema procesará SOLO los archivos de noviembre (sin confirmación adicional)
 ```
 
 ---

@@ -374,18 +374,13 @@ def seleccionar_archivos_excel():
             print("\n[ERROR] No se seleccionó ningún archivo válido.")
             return None
 
-        # Mostrar confirmación
+        # Mostrar archivos seleccionados
         print("\n" + "=" * 80)
         print("ARCHIVOS SELECCIONADOS:")
         print("=" * 80)
         for archivo in archivos_seleccionados:
             print(f"  - {archivo}")
         print()
-
-        confirmacion = input("¿Confirmar selección? (S/N): ").strip().upper()
-        if confirmacion not in ['S', 'SI', 'Y', 'YES']:
-            print("\n[INFO] Selección cancelada.")
-            return None
 
         return archivos_seleccionados
 

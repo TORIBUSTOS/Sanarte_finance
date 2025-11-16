@@ -35,11 +35,19 @@ class Analyzer:
         # Calcular saldos inicial y final
         saldo_inicial, saldo_final = self._calcular_saldos()
 
-        # Calcular totales
+        # Calcular totales (TODOS los movimientos)
         total_ingresos = self._calcular_ingresos()
         total_egresos = self._calcular_egresos()
         variacion = total_ingresos - total_egresos
         balance = total_ingresos - total_egresos  # Mantener por compatibilidad
+
+        # Calcular montos de movimientos sin clasificar
+        ingresos_sin_clasificar = df_sin_clasificar['Crédito'].sum()
+        egresos_sin_clasificar = df_sin_clasificar['Débito'].sum()
+
+        # Calcular montos solo de clasificados
+        ingresos_clasificados = df_clasificados[df_clasificados['Categoria'] == 'Ingresos']['Crédito'].sum()
+        egresos_clasificados = df_clasificados[df_clasificados['Categoria'] == 'Egresos']['Débito'].sum()
 
         # Validación de coherencia
         validacion_ok, diferencia = self._validar_coherencia_saldos(
@@ -72,6 +80,10 @@ class Analyzer:
             'total_egresos': total_egresos,
             'variacion': variacion,
             'balance': balance,  # Mantener por compatibilidad
+            'ingresos_clasificados': ingresos_clasificados,
+            'egresos_clasificados': egresos_clasificados,
+            'ingresos_sin_clasificar': ingresos_sin_clasificar,
+            'egresos_sin_clasificar': egresos_sin_clasificar,
             'total_movimientos': total_movimientos,
             'movimientos_clasificados': movimientos_clasificados,
             'movimientos_sin_clasificar': len(df_sin_clasificar),
@@ -150,23 +162,23 @@ class Analyzer:
 
     def _calcular_ingresos(self) -> float:
         """
-        Calcula el total de ingresos.
+        Calcula el total de ingresos (TODOS los créditos).
 
         Returns:
             Total de ingresos
         """
-        df_ingresos = self.df[self.df['Categoria'] == 'Ingresos']
-        return df_ingresos['Crédito'].sum()
+        # Sumar TODOS los créditos (clasificados y sin clasificar)
+        return self.df['Crédito'].sum()
 
     def _calcular_egresos(self) -> float:
         """
-        Calcula el total de egresos.
+        Calcula el total de egresos (TODOS los débitos).
 
         Returns:
             Total de egresos
         """
-        df_egresos = self.df[self.df['Categoria'] == 'Egresos']
-        return df_egresos['Débito'].sum()
+        # Sumar TODOS los débitos (clasificados y sin clasificar)
+        return self.df['Débito'].sum()
 
     def _desglose_ingresos(self) -> Dict[str, float]:
         """
@@ -266,7 +278,14 @@ class Analyzer:
             print(f"Saldo Inicial:   ${self.metricas['saldo_inicial']:,.2f}")
 
         print(f"Total Ingresos:  ${self.metricas['total_ingresos']:,.2f}")
+        if self.metricas['ingresos_sin_clasificar'] > 0:
+            print(f"  - Clasificados:    ${self.metricas['ingresos_clasificados']:,.2f}")
+            print(f"  - Sin clasificar:  ${self.metricas['ingresos_sin_clasificar']:,.2f}")
+
         print(f"Total Egresos:   ${self.metricas['total_egresos']:,.2f}")
+        if self.metricas['egresos_sin_clasificar'] > 0:
+            print(f"  - Clasificados:    ${self.metricas['egresos_clasificados']:,.2f}")
+            print(f"  - Sin clasificar:  ${self.metricas['egresos_sin_clasificar']:,.2f}")
 
         # Mostrar saldo final (puede ser NaN)
         if pd.isna(self.metricas['saldo_final']):

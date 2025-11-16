@@ -91,9 +91,12 @@ Sistema automatizado para procesamiento de extractos bancarios de múltiples ban
    python menu_principal.py
    ```
 
-2. **Verás un menú con 6 opciones:**
+2. **Verás un menú con 8 opciones:**
    - Opción 1: Ejecuta todo el proceso completo automáticamente
-   - Opción 2-4: Ejecuta solo un bloque específico
+   - Opción 2: Consolidar TODOS los archivos de la carpeta input
+   - Opción 3: Categorizar movimientos
+   - Opción 4: Generar reportes y dashboard
+   - Opción 7: **NUEVO** - Consolidar con SELECCIÓN de archivos específicos
    - Opción 5: Ver configuración
    - Opción 6: Ver información del sistema
    - Opción 0: Salir
@@ -105,6 +108,57 @@ Sistema automatizado para procesamiento de extractos bancarios de múltiples ban
 ### Opción 2: Uso Manual con Comandos (avanzado)
 
 Si prefieres usar comandos directos, continúa con la sección "Uso Mensual - Paso a Paso" más abajo.
+
+---
+
+## Selección de Archivos Específicos (NUEVO)
+
+### ¿Cuándo usar esta opción?
+
+- Cuando tienes varios archivos en la carpeta `input/` pero **solo quieres procesar algunos**
+- Cuando quieres procesar archivos de diferentes meses por separado
+- Cuando quieres excluir temporalmente ciertos archivos sin borrarlos
+
+### Cómo usar la Opción 7: Consolidar con Selección
+
+1. **Coloca todos tus archivos** en la carpeta `input/` (no importa cuántos sean)
+
+2. **Ejecuta INICIAR.bat** y selecciona la **opción 7**
+
+3. **El sistema mostrará** una lista numerada de todos los archivos:
+   ```
+   ARCHIVOS EXCEL DISPONIBLES EN ./input/
+   ================================================================================
+
+     1. Extracto_Galicia_octubre.xlsx
+     2. Extracto_Supervielle_octubre.xlsx
+     3. Extracto_Galicia_noviembre.xlsx
+     4. Extracto_Supervielle_noviembre.xlsx
+   ```
+
+4. **Ingresa los números** de los archivos que quieres procesar:
+   - Para un solo archivo: `1`
+   - Para varios archivos: `1,2` o `1,3,4`
+   - Para todos: `1,2,3,4`
+
+5. **Confirma tu selección** y el sistema procesará solo esos archivos
+
+### Ejemplo de Uso
+
+**Escenario:** Tienes extractos de octubre y noviembre, pero solo quieres procesar noviembre.
+
+```
+Ingresa tu selección: 3,4
+
+ARCHIVOS SELECCIONADOS:
+================================================================================
+  - Extracto_Galicia_noviembre.xlsx
+  - Extracto_Supervielle_noviembre.xlsx
+
+¿Confirmar selección? (S/N): S
+
+→ El sistema procesará SOLO los archivos de noviembre
+```
 
 ---
 

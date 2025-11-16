@@ -7,6 +7,7 @@ Versión: 1.3 - Bloque 4: Orquestador Completo
 """
 import os
 import sys
+from glob import glob
 from datetime import datetime
 
 # Agregar el directorio src al path para imports
@@ -46,9 +47,11 @@ def mostrar_menu_principal():
     print("|                                                             |")
     print("|  1. PROCESO COMPLETO (Consolidar -> Categorizar -> Reportes)|")
     print("|                                                             |")
-    print("|  2. Solo CONSOLIDAR extractos bancarios                     |")
+    print("|  2. Solo CONSOLIDAR extractos bancarios (todos)             |")
     print("|  3. Solo CATEGORIZAR movimientos                            |")
     print("|  4. Solo generar REPORTES y Dashboard                       |")
+    print("|                                                             |")
+    print("|  7. CONSOLIDAR con SELECCIÓN de archivos                    |")
     print("|                                                             |")
     print("|  5. Configuracion de rutas                                  |")
     print("|  6. Informacion del sistema                                 |")
@@ -241,6 +244,106 @@ def informacion_sistema():
     input("\nPresiona ENTER para volver al menú principal...")
 
 
+def seleccionar_archivos_excel():
+    """
+    Muestra los archivos Excel disponibles y permite seleccionar cuáles procesar.
+
+    Returns:
+        Lista de nombres de archivos seleccionados o None si se cancela
+    """
+    ruta_input = "./input"
+
+    # Buscar archivos Excel
+    archivos_completos = glob(os.path.join(ruta_input, "*.xlsx"))
+
+    if not archivos_completos:
+        print(f"\n[ERROR] No se encontraron archivos Excel (.xlsx) en '{ruta_input}'")
+        print(f"Por favor, coloca los extractos bancarios en esa carpeta.")
+        return None
+
+    # Obtener solo los nombres de archivo (sin ruta)
+    archivos = [os.path.basename(f) for f in archivos_completos]
+
+    print("\n" + "=" * 80)
+    print("ARCHIVOS EXCEL DISPONIBLES EN ./input/")
+    print("=" * 80 + "\n")
+
+    # Mostrar lista numerada
+    for i, archivo in enumerate(archivos, 1):
+        print(f"  {i}. {archivo}")
+
+    print("\n" + "-" * 80)
+    print("INSTRUCCIONES:")
+    print("  - Para seleccionar archivos, ingresa los números separados por comas")
+    print("  - Ejemplos: '1' para el primero, '1,3' para el 1 y 3, '1,2,3' para todos")
+    print("  - Presiona ENTER sin ingresar nada para CANCELAR")
+    print("-" * 80 + "\n")
+
+    seleccion = input("Ingresa tu selección: ").strip()
+
+    if not seleccion:
+        print("\n[INFO] Selección cancelada.")
+        return None
+
+    try:
+        # Parsear la selección
+        indices = [int(x.strip()) for x in seleccion.split(',')]
+
+        # Validar que los índices estén en rango
+        archivos_seleccionados = []
+        for idx in indices:
+            if 1 <= idx <= len(archivos):
+                archivos_seleccionados.append(archivos[idx - 1])
+            else:
+                print(f"\n[ADVERTENCIA] Número {idx} fuera de rango. Ignorando...")
+
+        if not archivos_seleccionados:
+            print("\n[ERROR] No se seleccionó ningún archivo válido.")
+            return None
+
+        # Mostrar confirmación
+        print("\n" + "=" * 80)
+        print("ARCHIVOS SELECCIONADOS:")
+        print("=" * 80)
+        for archivo in archivos_seleccionados:
+            print(f"  - {archivo}")
+        print()
+
+        confirmacion = input("¿Confirmar selección? (S/N): ").strip().upper()
+        if confirmacion not in ['S', 'SI', 'Y', 'YES']:
+            print("\n[INFO] Selección cancelada.")
+            return None
+
+        return archivos_seleccionados
+
+    except ValueError:
+        print("\n[ERROR] Formato inválido. Debes ingresar números separados por comas.")
+        return None
+
+
+def consolidar_con_seleccion():
+    """Ejecuta consolidación con selección manual de archivos."""
+    print("\n" + "=" * 80)
+    print(">> CONSOLIDAR CON SELECCIÓN DE ARCHIVOS")
+    print("=" * 80)
+
+    # Seleccionar archivos
+    archivos_seleccionados = seleccionar_archivos_excel()
+
+    if archivos_seleccionados is None:
+        input("\nPresiona ENTER para volver al menú principal...")
+        return
+
+    # Ejecutar consolidación con archivos seleccionados
+    print("\n" + "=" * 80)
+    print("PROCESANDO ARCHIVOS SELECCIONADOS")
+    print("=" * 80 + "\n")
+
+    consolidar_bancos(archivos_seleccionados=archivos_seleccionados)
+
+    input("\nPresiona ENTER para volver al menú principal...")
+
+
 def main():
     """Función principal del menú CLI."""
     while True:
@@ -274,6 +377,9 @@ def main():
 
             elif opcion == '6':
                 informacion_sistema()
+
+            elif opcion == '7':
+                consolidar_con_seleccion()
 
             else:
                 print("\n[ERROR] Opción inválida. Por favor selecciona una opción del menú.")

@@ -55,13 +55,14 @@ def detectar_banco(ruta_archivo: str):
         return None, None
 
 
-def consolidar_bancos(ruta_input: str = "./input", ruta_output: str = "./output"):
+def consolidar_bancos(ruta_input: str = "./input", ruta_output: str = "./output", archivos_seleccionados: list = None):
     """
     Proceso completo de consolidación de extractos bancarios.
 
     Args:
         ruta_input: Carpeta donde están los archivos Excel
         ruta_output: Carpeta donde se guardarán los resultados
+        archivos_seleccionados: Lista opcional de nombres de archivos específicos a procesar
     """
     print("="*80)
     print("SANARTE - Sistema de Control Financiero")
@@ -75,7 +76,12 @@ def consolidar_bancos(ruta_input: str = "./input", ruta_output: str = "./output"
         return
 
     # Buscar archivos Excel en la carpeta input
-    archivos_excel = glob(os.path.join(ruta_input, "*.xlsx"))
+    if archivos_seleccionados:
+        # Usar solo los archivos seleccionados
+        archivos_excel = [os.path.join(ruta_input, archivo) for archivo in archivos_seleccionados]
+    else:
+        # Buscar todos los archivos Excel
+        archivos_excel = glob(os.path.join(ruta_input, "*.xlsx"))
 
     if not archivos_excel:
         print(f"\nNo se encontraron archivos Excel (.xlsx) en '{ruta_input}'")

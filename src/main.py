@@ -188,7 +188,7 @@ def categorizar_movimientos(ruta_archivo_consolidado: str = None,
         return
 
     # Crear categorizador
-    categorizer = Categorizer(umbral_confianza=70)
+    categorizer = Categorizer()
 
     # Categorizar
     df_categorizado = categorizer.categorizar_dataframe(df)

@@ -29,8 +29,8 @@ class Analyzer:
         print("\nCalculando metricas financieras...")
 
         # Filtrar movimientos clasificados vs sin clasificar
-        df_clasificados = self.df[self.df['Categoria'] != 'Sin Clasificar']
-        df_sin_clasificar = self.df[self.df['Categoria'] == 'Sin Clasificar']
+        df_clasificados = self.df[self.df['Categoria_Principal'] != 'Sin Clasificar']
+        df_sin_clasificar = self.df[self.df['Categoria_Principal'] == 'Sin Clasificar']
 
         # Calcular saldos inicial y final
         saldo_inicial, saldo_final = self._calcular_saldos()
@@ -46,8 +46,8 @@ class Analyzer:
         egresos_sin_clasificar = df_sin_clasificar['Débito'].sum()
 
         # Calcular montos solo de clasificados
-        ingresos_clasificados = df_clasificados[df_clasificados['Categoria'] == 'Ingresos']['Crédito'].sum()
-        egresos_clasificados = df_clasificados[df_clasificados['Categoria'] == 'Egresos']['Débito'].sum()
+        ingresos_clasificados = df_clasificados[df_clasificados['Tipo_Movimiento'] == 'Ingreso']['Crédito'].sum()
+        egresos_clasificados = df_clasificados[df_clasificados['Tipo_Movimiento'] == 'Egreso']['Débito'].sum()
 
         # Validación de coherencia
         validacion_ok, diferencia = self._validar_coherencia_saldos(
@@ -189,24 +189,24 @@ class Analyzer:
 
     def _desglose_ingresos(self) -> Dict[str, float]:
         """
-        Desglose de ingresos por subcategoría.
+        Desglose de ingresos por categoría final.
 
         Returns:
-            Diccionario {subcategoria: monto}
+            Diccionario {categoria_final: monto}
         """
-        df_ingresos = self.df[self.df['Categoria'] == 'Ingresos']
-        desglose = df_ingresos.groupby('Subcategoria')['Crédito'].sum().to_dict()
+        df_ingresos = self.df[self.df['Tipo_Movimiento'] == 'Ingreso']
+        desglose = df_ingresos.groupby('Categoria_Final')['Crédito'].sum().to_dict()
         return desglose
 
     def _desglose_egresos(self) -> Dict[str, float]:
         """
-        Desglose de egresos por subcategoría.
+        Desglose de egresos por categoría final.
 
         Returns:
-            Diccionario {subcategoria: monto}
+            Diccionario {categoria_final: monto}
         """
-        df_egresos = self.df[self.df['Categoria'] == 'Egresos']
-        desglose = df_egresos.groupby('Subcategoria')['Débito'].sum().to_dict()
+        df_egresos = self.df[self.df['Tipo_Movimiento'] == 'Egreso']
+        desglose = df_egresos.groupby('Categoria_Final')['Débito'].sum().to_dict()
         return desglose
 
     def _top_prestadores(self, n: int = 10) -> List[Dict]:
@@ -219,7 +219,7 @@ class Analyzer:
         Returns:
             Lista de diccionarios con nombre y monto
         """
-        df_prestadores = self.df[self.df['Subcategoria'] == 'Prestadores']
+        df_prestadores = self.df[self.df['Categoria_Principal'] == 'Prestadores']
 
         if len(df_prestadores) == 0:
             return []
@@ -248,13 +248,13 @@ class Analyzer:
         self.df['Fecha_Solo'] = pd.to_datetime(self.df['Fecha']).dt.date
 
         # Filtrar solo clasificados
-        df_clasificados = self.df[self.df['Categoria'] != 'Sin Clasificar'].copy()
+        df_clasificados = self.df[self.df['Categoria_Principal'] != 'Sin Clasificar'].copy()
 
         # Calcular ingresos por fecha
-        ingresos_diarios = df_clasificados[df_clasificados['Categoria'] == 'Ingresos'].groupby('Fecha_Solo')['Crédito'].sum()
+        ingresos_diarios = df_clasificados[df_clasificados['Tipo_Movimiento'] == 'Ingreso'].groupby('Fecha_Solo')['Crédito'].sum()
 
         # Calcular egresos por fecha
-        egresos_diarios = df_clasificados[df_clasificados['Categoria'] == 'Egresos'].groupby('Fecha_Solo')['Débito'].sum()
+        egresos_diarios = df_clasificados[df_clasificados['Tipo_Movimiento'] == 'Egreso'].groupby('Fecha_Solo')['Débito'].sum()
 
         # Obtener todas las fechas únicas
         todas_fechas = sorted(df_clasificados['Fecha_Solo'].unique())
@@ -346,4 +346,4 @@ class Analyzer:
         Returns:
             DataFrame con movimientos sin clasificar
         """
-        return self.df[self.df['Categoria'] == 'Sin Clasificar'].copy()
+        return self.df[self.df['Categoria_Principal'] == 'Sin Clasificar'].copy()

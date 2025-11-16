@@ -118,7 +118,7 @@ class ExcelExporter:
         """
         Crea la hoja de desglose de ingresos con resumen de saldos.
         """
-        df_ingresos = self.df[self.df['Categoria'] == 'Ingresos'].copy()
+        df_ingresos = self.df[self.df['Tipo_Movimiento'] == 'Ingreso'].copy()
 
         if len(df_ingresos) == 0:
             # Hoja vacía con mensaje
@@ -153,7 +153,7 @@ class ExcelExporter:
         df_resumen = pd.DataFrame(datos_resumen, columns=['Concepto', 'Valor'])
 
         # Seleccionar columnas relevantes
-        columnas = ['Fecha', 'Concepto', 'Detalle', 'Crédito', 'Subcategoria',
+        columnas = ['Fecha', 'Concepto', 'Detalle', 'Crédito', 'Categoria_Final',
                    'Persona_Nombre', 'Es_DEBIN', 'Banco']
 
         df_export = df_ingresos[columnas].copy()
@@ -173,7 +173,7 @@ class ExcelExporter:
         """
         Crea la hoja de desglose de egresos con resumen de saldos.
         """
-        df_egresos = self.df[self.df['Categoria'] == 'Egresos'].copy()
+        df_egresos = self.df[self.df['Tipo_Movimiento'] == 'Egreso'].copy()
 
         if len(df_egresos) == 0:
             pd.DataFrame(['No hay egresos registrados']).to_excel(writer, sheet_name='Egresos', index=False, header=False)
@@ -207,7 +207,7 @@ class ExcelExporter:
         df_resumen = pd.DataFrame(datos_resumen, columns=['Concepto', 'Valor'])
 
         # Seleccionar columnas relevantes de egresos
-        columnas = ['Fecha', 'Concepto', 'Detalle', 'Débito', 'Subcategoria',
+        columnas = ['Fecha', 'Concepto', 'Detalle', 'Débito', 'Categoria_Final',
                    'Persona_Nombre', 'Banco']
 
         df_export = df_egresos[columnas].copy()
@@ -249,7 +249,7 @@ class ExcelExporter:
         """
         Crea la hoja de movimientos sin clasificar.
         """
-        df_sin_clasificar = self.df[self.df['Categoria'] == 'Sin Clasificar'].copy()
+        df_sin_clasificar = self.df[self.df['Categoria_Principal'] == 'Sin Clasificar'].copy()
 
         if len(df_sin_clasificar) == 0:
             pd.DataFrame(['Todos los movimientos estan clasificados']).to_excel(writer, sheet_name='Sin Clasificar', index=False, header=False)

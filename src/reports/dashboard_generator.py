@@ -12,14 +12,17 @@ class DashboardGenerator:
     Genera dashboard HTML interactivo con Chart.js.
     """
 
-    def __init__(self, metricas: Dict, df_sin_clasificar: pd.DataFrame):
+    def __init__(self, df: pd.DataFrame, metricas: Dict):
         """
         Args:
+            df: DataFrame con movimientos categorizados (con columnas Tipo_Movimiento, Categoria_Final)
             metricas: Diccionario con métricas calculadas
-            df_sin_clasificar: DataFrame con movimientos sin clasificar
         """
+        self.df = df
         self.metricas = metricas
-        self.df_sin_clasificar = df_sin_clasificar
+
+        # Filtrar sin clasificar
+        self.df_sin_clasificar = df[df['Categoria_Principal'] == 'Sin Clasificar'].copy()
 
     def generar_html(self, ruta_salida: str):
         """
@@ -44,9 +47,13 @@ class DashboardGenerator:
         Returns:
             String con el HTML
         """
+        # Calcular datos REALES desde el DataFrame categorizado
+        ingresos_por_categoria = self._calcular_ingresos_por_categoria()
+        egresos_por_categoria = self._calcular_egresos_por_categoria()
+
         # Preparar datos para gráficos
-        datos_ingresos = self._preparar_datos_torta(self.metricas['ingresos_por_subcategoria'])
-        datos_egresos = self._preparar_datos_torta(self.metricas['egresos_por_subcategoria'])
+        datos_ingresos = self._preparar_datos_torta(ingresos_por_categoria)
+        datos_egresos = self._preparar_datos_torta(egresos_por_categoria)
         datos_flujo = self._preparar_datos_flujo(self.metricas['flujo_diario'])
 
         # Color del balance
@@ -495,6 +502,46 @@ class DashboardGenerator:
 </html>"""
 
         return html
+
+    def _calcular_ingresos_por_categoria(self) -> Dict[str, float]:
+        """
+        Calcula ingresos REALES por Categoria_Final desde el DataFrame.
+
+        Returns:
+            Diccionario {categoria_final: monto}
+        """
+        df_ingresos = self.df[self.df['Tipo_Movimiento'] == 'Ingreso'].copy()
+
+        if len(df_ingresos) == 0:
+            return {}
+
+        # Agrupar por Categoria_Final y sumar Crédito
+        ingresos_por_cat = df_ingresos.groupby('Categoria_Final')['Crédito'].sum()
+
+        # Ordenar de mayor a menor
+        ingresos_por_cat = ingresos_por_cat.sort_values(ascending=False)
+
+        return ingresos_por_cat.to_dict()
+
+    def _calcular_egresos_por_categoria(self) -> Dict[str, float]:
+        """
+        Calcula egresos REALES por Categoria_Final desde el DataFrame.
+
+        Returns:
+            Diccionario {categoria_final: monto}
+        """
+        df_egresos = self.df[self.df['Tipo_Movimiento'] == 'Egreso'].copy()
+
+        if len(df_egresos) == 0:
+            return {}
+
+        # Agrupar por Categoria_Final y sumar Débito
+        egresos_por_cat = df_egresos.groupby('Categoria_Final')['Débito'].sum()
+
+        # Ordenar de mayor a menor
+        egresos_por_cat = egresos_por_cat.sort_values(ascending=False)
+
+        return egresos_por_cat.to_dict()
 
     def _preparar_datos_torta(self, datos: Dict) -> str:
         """

@@ -99,15 +99,19 @@ class ExcelExporter:
             ['DESGLOSE INGRESOS', 'Monto'],
         ])
 
-        # Agregar ingresos por subcategoría
-        for sub, monto in self.metricas['ingresos_por_subcategoria'].items():
+        # Agregar ingresos por subcategoría (ordenados de mayor a menor)
+        ingresos_ordenados = sorted(self.metricas['ingresos_por_subcategoria'].items(),
+                                    key=lambda x: x[1], reverse=True)
+        for sub, monto in ingresos_ordenados:
             datos.append([sub, f"${monto:,.2f}"])
 
         datos.append(['', ''])
         datos.append(['DESGLOSE EGRESOS', 'Monto'])
 
-        # Agregar egresos por subcategoría
-        for sub, monto in self.metricas['egresos_por_subcategoria'].items():
+        # Agregar egresos por subcategoría (ordenados de mayor a menor)
+        egresos_ordenados = sorted(self.metricas['egresos_por_subcategoria'].items(),
+                                   key=lambda x: x[1], reverse=True)
+        for sub, monto in egresos_ordenados:
             datos.append([sub, f"${monto:,.2f}"])
 
         # Crear DataFrame y exportar
@@ -138,8 +142,10 @@ class ExcelExporter:
             ['DESGLOSE POR SUBCATEGORIA', 'Monto'],
         ]
 
-        # Agregar ingresos por subcategoría
-        for sub, monto in self.metricas['ingresos_por_subcategoria'].items():
+        # Agregar ingresos por subcategoría (ordenados de mayor a menor)
+        ingresos_ordenados = sorted(self.metricas['ingresos_por_subcategoria'].items(),
+                                    key=lambda x: x[1], reverse=True)
+        for sub, monto in ingresos_ordenados:
             porcentaje = (monto / self.metricas['total_ingresos'] * 100) if self.metricas['total_ingresos'] > 0 else 0
             datos_resumen.append([sub, f"${monto:,.2f} ({porcentaje:.1f}%)"])
 
@@ -192,8 +198,10 @@ class ExcelExporter:
             ['DESGLOSE POR SUBCATEGORIA', 'Monto'],
         ]
 
-        # Agregar egresos por subcategoría
-        for sub, monto in self.metricas['egresos_por_subcategoria'].items():
+        # Agregar egresos por subcategoría (ordenados de mayor a menor)
+        egresos_ordenados = sorted(self.metricas['egresos_por_subcategoria'].items(),
+                                   key=lambda x: x[1], reverse=True)
+        for sub, monto in egresos_ordenados:
             porcentaje = (monto / self.metricas['total_egresos'] * 100) if self.metricas['total_egresos'] > 0 else 0
             datos_resumen.append([sub, f"${monto:,.2f} ({porcentaje:.1f}%)"])
 

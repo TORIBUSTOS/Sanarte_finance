@@ -285,7 +285,7 @@ class DashboardGenerator:
             <div class="cards">
                 <div class="card saldo-inicial">
                     <div class="card-title">Saldo Inicial</div>
-                    <div class="card-value">${self.metricas['saldo_inicial']:,.2f}</div>
+                    <div class="card-value">{'No disponible' if pd.isna(self.metricas['saldo_inicial']) else f"${self.metricas['saldo_inicial']:,.2f}"}</div>
                 </div>
 
                 <div class="card ingresos">
@@ -300,7 +300,7 @@ class DashboardGenerator:
 
                 <div class="card saldo-final">
                     <div class="card-title">Saldo Final</div>
-                    <div class="card-value">${self.metricas['saldo_final']:,.2f}</div>
+                    <div class="card-value">{'No disponible' if pd.isna(self.metricas['saldo_final']) else f"${self.metricas['saldo_final']:,.2f}"}</div>
                 </div>
 
                 <div class="card variacion">

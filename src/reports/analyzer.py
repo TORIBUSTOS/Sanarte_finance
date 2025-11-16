@@ -103,6 +103,11 @@ class Analyzer:
         if len(self.df) == 0:
             return 0.0, 0.0
 
+        # Verificar si existe la columna Saldo y tiene valores
+        if 'Saldo' not in self.df.columns:
+            print("  ADVERTENCIA: El archivo no tiene columna 'Saldo'. No se puede calcular saldo inicial/final.")
+            return float('nan'), float('nan')
+
         # Ordenar por fecha
         df_ordenado = self.df.sort_values('Fecha')
 
@@ -111,6 +116,11 @@ class Analyzer:
 
         # Saldo final: último movimiento
         saldo_final = df_ordenado.iloc[-1]['Saldo']
+
+        # Verificar si son NaN
+        if pd.isna(saldo_inicial) or pd.isna(saldo_final):
+            print("  ADVERTENCIA: La columna 'Saldo' existe pero no tiene valores. No se puede calcular saldo inicial/final.")
+            return float('nan'), float('nan')
 
         return saldo_inicial, saldo_final
 
@@ -248,10 +258,22 @@ class Analyzer:
         """
         print("\nRESUMEN FINANCIERO:")
         print("="*80)
-        print(f"Saldo Inicial:   ${self.metricas['saldo_inicial']:,.2f}")
+
+        # Mostrar saldo inicial (puede ser NaN)
+        if pd.isna(self.metricas['saldo_inicial']):
+            print(f"Saldo Inicial:   No disponible (archivo sin columna Saldo)")
+        else:
+            print(f"Saldo Inicial:   ${self.metricas['saldo_inicial']:,.2f}")
+
         print(f"Total Ingresos:  ${self.metricas['total_ingresos']:,.2f}")
         print(f"Total Egresos:   ${self.metricas['total_egresos']:,.2f}")
-        print(f"Saldo Final:     ${self.metricas['saldo_final']:,.2f}")
+
+        # Mostrar saldo final (puede ser NaN)
+        if pd.isna(self.metricas['saldo_final']):
+            print(f"Saldo Final:     No disponible (archivo sin columna Saldo)")
+        else:
+            print(f"Saldo Final:     ${self.metricas['saldo_final']:,.2f}")
+
         print(f"Variacion:       ${self.metricas['variacion']:,.2f}")
 
         # Validación de coherencia

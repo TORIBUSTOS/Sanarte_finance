@@ -21,6 +21,20 @@ class ExcelExporter:
         self.df = df
         self.metricas = metricas
 
+    def _formatear_monto(self, valor: float) -> str:
+        """
+        Formatea un monto manejando valores NaN.
+
+        Args:
+            valor: Valor a formatear
+
+        Returns:
+            String formateado
+        """
+        if pd.isna(valor):
+            return "No disponible"
+        return f"${valor:,.2f}"
+
     def exportar(self, ruta_salida: str):
         """
         Exporta el reporte ejecutivo a Excel.
@@ -60,10 +74,10 @@ class ExcelExporter:
             ['SANARTE - RESUMEN EJECUTIVO', ''],
             ['', ''],
             ['SALDOS BANCARIOS', ''],
-            ['Saldo Inicial', f"${self.metricas['saldo_inicial']:,.2f}"],
+            ['Saldo Inicial', self._formatear_monto(self.metricas['saldo_inicial'])],
             ['Total Ingresos', f"${self.metricas['total_ingresos']:,.2f}"],
             ['Total Egresos', f"${self.metricas['total_egresos']:,.2f}"],
-            ['Saldo Final', f"${self.metricas['saldo_final']:,.2f}"],
+            ['Saldo Final', self._formatear_monto(self.metricas['saldo_final'])],
             ['Variacion del Mes', f"${self.metricas['variacion']:,.2f}"],
             ['', ''],
         ]
@@ -116,10 +130,10 @@ class ExcelExporter:
         datos_resumen = [
             ['ANALISIS DE INGRESOS - RESUMEN', ''],
             ['', ''],
-            ['Saldo Inicial', f"${self.metricas['saldo_inicial']:,.2f}"],
+            ['Saldo Inicial', self._formatear_monto(self.metricas['saldo_inicial'])],
             ['Total Ingresos', f"${self.metricas['total_ingresos']:,.2f}"],
             ['Total Egresos', f"${self.metricas['total_egresos']:,.2f}"],
-            ['Saldo Final', f"${self.metricas['saldo_final']:,.2f}"],
+            ['Saldo Final', self._formatear_monto(self.metricas['saldo_final'])],
             ['', ''],
             ['DESGLOSE POR SUBCATEGORIA', 'Monto'],
         ]
@@ -170,10 +184,10 @@ class ExcelExporter:
         datos_resumen = [
             ['ANALISIS DE GASTOS - RESUMEN', ''],
             ['', ''],
-            ['Saldo Inicial', f"${self.metricas['saldo_inicial']:,.2f}"],
+            ['Saldo Inicial', self._formatear_monto(self.metricas['saldo_inicial'])],
             ['Total Egresos', f"${self.metricas['total_egresos']:,.2f}"],
             ['Total Ingresos', f"${self.metricas['total_ingresos']:,.2f}"],
-            ['Saldo Final', f"${self.metricas['saldo_final']:,.2f}"],
+            ['Saldo Final', self._formatear_monto(self.metricas['saldo_final'])],
             ['', ''],
             ['DESGLOSE POR SUBCATEGORIA', 'Monto'],
         ]

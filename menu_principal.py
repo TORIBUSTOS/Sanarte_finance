@@ -47,14 +47,13 @@ def mostrar_menu_principal():
     print("|                                                             |")
     print("|  1. PROCESO COMPLETO (Consolidar -> Categorizar -> Reportes)|")
     print("|                                                             |")
-    print("|  2. Solo CONSOLIDAR extractos bancarios (todos)             |")
-    print("|  3. Solo CATEGORIZAR movimientos                            |")
-    print("|  4. Solo generar REPORTES y Dashboard                       |")
+    print("|  2. CONSOLIDAR extractos bancarios (todos los archivos)     |")
+    print("|  3. CONSOLIDAR con SELECCIÓN de archivos específicos        |")
+    print("|  4. CATEGORIZAR movimientos                                 |")
+    print("|  5. Generar REPORTES y Dashboard                            |")
     print("|                                                             |")
-    print("|  7. CONSOLIDAR con SELECCIÓN de archivos                    |")
-    print("|                                                             |")
-    print("|  5. Configuracion de rutas                                  |")
-    print("|  6. Informacion del sistema                                 |")
+    print("|  6. Configuracion de rutas                                  |")
+    print("|  7. Informacion del sistema                                 |")
     print("|                                                             |")
     print("|  0. SALIR                                                   |")
     print("|                                                             |")
@@ -367,19 +366,19 @@ def main():
                 solo_consolidar()
 
             elif opcion == '3':
-                solo_categorizar()
+                consolidar_con_seleccion()
 
             elif opcion == '4':
-                solo_reportes()
+                solo_categorizar()
 
             elif opcion == '5':
-                configuracion()
+                solo_reportes()
 
             elif opcion == '6':
-                informacion_sistema()
+                configuracion()
 
             elif opcion == '7':
-                consolidar_con_seleccion()
+                informacion_sistema()
 
             else:
                 print("\n[ERROR] Opción inválida. Por favor selecciona una opción del menú.")

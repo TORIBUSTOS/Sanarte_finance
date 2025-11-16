@@ -94,11 +94,11 @@ Sistema automatizado para procesamiento de extractos bancarios de múltiples ban
 2. **Verás un menú con 8 opciones:**
    - Opción 1: Ejecuta todo el proceso completo automáticamente
    - Opción 2: Consolidar TODOS los archivos de la carpeta input
-   - Opción 3: Categorizar movimientos
-   - Opción 4: Generar reportes y dashboard
-   - Opción 7: **NUEVO** - Consolidar con SELECCIÓN de archivos específicos
-   - Opción 5: Ver configuración
-   - Opción 6: Ver información del sistema
+   - Opción 3: **NUEVO** - Consolidar con SELECCIÓN de archivos específicos
+   - Opción 4: Categorizar movimientos
+   - Opción 5: Generar reportes y dashboard
+   - Opción 6: Ver configuración
+   - Opción 7: Ver información del sistema
    - Opción 0: Salir
 
 3. **Selecciona la opción deseada** ingresando el número y presionando ENTER
@@ -119,11 +119,11 @@ Si prefieres usar comandos directos, continúa con la sección "Uso Mensual - Pa
 - Cuando quieres procesar archivos de diferentes meses por separado
 - Cuando quieres excluir temporalmente ciertos archivos sin borrarlos
 
-### Cómo usar la Opción 7: Consolidar con Selección
+### Cómo usar la Opción 3: Consolidar con Selección
 
 1. **Coloca todos tus archivos** en la carpeta `input/` (no importa cuántos sean)
 
-2. **Ejecuta INICIAR.bat** y selecciona la **opción 7**
+2. **Ejecuta INICIAR.bat** y selecciona la **opción 3**
 
 3. **El sistema mostrará** una lista numerada de todos los archivos:
    ```

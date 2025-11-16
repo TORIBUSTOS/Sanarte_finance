@@ -219,6 +219,26 @@ def solo_reportes():
 
     if archivo_a_usar:
         print(f"[SESION] Usando archivo categorizado: {os.path.basename(archivo_a_usar)}\n")
+    else:
+        # No hay sesión, intentar buscar archivo más reciente
+        from glob import glob
+        archivos_categorizados = glob(os.path.join("./output", "movimientos_categorizados_*.xlsx"))
+
+        if not archivos_categorizados:
+            print("[ERROR] No se puede generar el reporte.")
+            print("\nMotivo: No hay archivo categorizado disponible.")
+            print("\nSoluciones:")
+            print("  1. Ejecuta primero el flujo completo:")
+            print("     - Opcion 2 o 3: Consolidar")
+            print("     - Opcion 4: Categorizar")
+            print("     - Opcion 5: Reportes (esta opcion)")
+            print("\n  2. O usa la Opcion 1 (Proceso completo automatico)")
+            input("\nPresiona ENTER para volver al menú principal...")
+            return
+
+        # Hay archivos antiguos, usar el más reciente
+        print("[INFO] No hay sesión activa.")
+        print("Se usará el archivo categorizado más reciente encontrado en ./output/\n")
 
     generar_reportes(ruta_archivo_categorizado=archivo_a_usar)
 

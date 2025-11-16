@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Archivos de output (reportes generados)
+output/*.xlsx
+output/*.html
+
+# Archivos de input (extractos bancarios con datos sensibles)
+input/*.xlsx
+!input/Ejemplo_*.xlsx
+
+# Entornos virtuales
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Sistema operativo
+.DS_Store
+Thumbs.db

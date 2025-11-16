@@ -91,14 +91,15 @@ Sistema automatizado para procesamiento de extractos bancarios de múltiples ban
    python menu_principal.py
    ```
 
-2. **Verás un menú con 8 opciones:**
+2. **Verás un menú con 9 opciones:**
    - Opción 1: Ejecuta todo el proceso completo automáticamente
    - Opción 2: Consolidar TODOS los archivos de la carpeta input
    - Opción 3: **NUEVO** - Consolidar con SELECCIÓN de archivos específicos
-   - Opción 4: Categorizar movimientos
-   - Opción 5: Generar reportes y dashboard
+   - Opción 4: Categorizar movimientos (usa automáticamente el archivo de la sesión)
+   - Opción 5: Generar reportes y dashboard (usa automáticamente el archivo de la sesión)
    - Opción 6: Ver configuración
    - Opción 7: Ver información del sistema
+   - Opción 8: **NUEVO** - Limpiar sesión de trabajo
    - Opción 0: Salir
 
 3. **Selecciona la opción deseada** ingresando el número y presionando ENTER
@@ -108,6 +109,81 @@ Sistema automatizado para procesamiento de extractos bancarios de múltiples ban
 ### Opción 2: Uso Manual con Comandos (avanzado)
 
 Si prefieres usar comandos directos, continúa con la sección "Uso Mensual - Paso a Paso" más abajo.
+
+---
+
+## Sistema de Sesión de Trabajo (NUEVO)
+
+El sistema ahora **recuerda** qué archivos estás procesando durante toda la sesión, permitiéndote trabajar con un flujo más natural **sin tener que borrar archivos** entre procesos.
+
+### ¿Cómo funciona?
+
+**Antes:** Tenías que borrar archivos de `input/` para procesar diferentes meses por separado.
+
+**Ahora:** El sistema mantiene una **sesión de trabajo** que recuerda:
+- Qué archivos consolidaste
+- Qué archivo se generó al consolidar
+- Qué archivo se generó al categorizar
+
+### Flujo de Trabajo con Sesión
+
+```
+1. Opción 2 o 3: CONSOLIDAR
+   ↓
+   [SESION] Archivo listo para CATEGORIZAR
+
+2. Opción 4: CATEGORIZAR
+   ↓ (usa automáticamente el archivo consolidado)
+   [SESION] Archivo listo para REPORTES
+
+3. Opción 5: REPORTES
+   ↓ (usa automáticamente el archivo categorizado)
+   ✓ Dashboard y reportes generados
+```
+
+### Ventajas
+
+- **No borras archivos**: Puedes tener extractos de varios meses en `input/`
+- **Flujo natural**: Consolidar → Categorizar → Reportes sin especificar archivos
+- **Visualización clara**: El banner muestra qué archivos estás procesando
+- **Control total**: Opción 8 para limpiar sesión y empezar de nuevo
+
+### Ejemplo de Uso
+
+**Escenario:** Tienes extractos de octubre y noviembre. Quieres procesar noviembre solamente.
+
+```
+Paso 1: Opción 3 (Consolidar con selección)
+  → Selecciono archivos de noviembre
+  → [SESION] Archivo listo para CATEGORIZAR
+
+Paso 2: Opción 4 (Categorizar)
+  → Sistema usa automáticamente el archivo consolidado de noviembre
+  → [SESION] Archivo listo para REPORTES
+
+Paso 3: Opción 5 (Reportes)
+  → Sistema usa automáticamente el archivo categorizado de noviembre
+  → Dashboard de noviembre generado
+
+Paso 4 (OPCIONAL): Opción 8 (Limpiar sesión)
+  → Ahora puedo procesar octubre desde cero
+```
+
+### Banner con Información de Sesión
+
+Cuando tienes una sesión activa, el banner te muestra:
+
+```
+================================================================================
+Fecha y hora: 15/11/2025 14:30:00
+================================================================================
+
+[SESION ACTIVA]
+  Archivos input: Extracto_Galicia_noviembre.xlsx, Extracto_Supervielle_noviembre.xlsx
+  Consolidado: movimientos_consolidados_2025_11.xlsx
+  Categorizado: movimientos_categorizados_2025_11.xlsx
+================================================================================
+```
 
 ---
 

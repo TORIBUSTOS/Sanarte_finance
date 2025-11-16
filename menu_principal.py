@@ -18,6 +18,13 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 from main import consolidar_bancos, categorizar_movimientos, generar_reportes
 
+# Variable global para mantener el contexto de la sesión de trabajo
+sesion_trabajo = {
+    'archivo_consolidado': None,
+    'archivo_categorizado': None,
+    'archivos_input_usados': []
+}
+
 
 def limpiar_pantalla():
     """Limpia la pantalla de la consola."""
@@ -36,7 +43,19 @@ def mostrar_banner():
     print("=" * 80)
     fecha_hora = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
     print(f"Fecha y hora: {fecha_hora}")
-    print("=" * 80 + "\n")
+    print("=" * 80)
+
+    # Mostrar estado de la sesión de trabajo
+    if sesion_trabajo['archivo_consolidado'] or sesion_trabajo['archivo_categorizado']:
+        print("\n[SESION ACTIVA]")
+        if sesion_trabajo['archivos_input_usados']:
+            print(f"  Archivos input: {', '.join(sesion_trabajo['archivos_input_usados'])}")
+        if sesion_trabajo['archivo_consolidado']:
+            print(f"  Consolidado: {os.path.basename(sesion_trabajo['archivo_consolidado'])}")
+        if sesion_trabajo['archivo_categorizado']:
+            print(f"  Categorizado: {os.path.basename(sesion_trabajo['archivo_categorizado'])}")
+        print("=" * 80)
+    print()
 
 
 def mostrar_menu_principal():
@@ -54,6 +73,7 @@ def mostrar_menu_principal():
     print("|                                                             |")
     print("|  6. Configuracion de rutas                                  |")
     print("|  7. Informacion del sistema                                 |")
+    print("|  8. Limpiar SESION de trabajo                               |")
     print("|                                                             |")
     print("|  0. SALIR                                                   |")
     print("|                                                             |")
@@ -144,7 +164,19 @@ def solo_consolidar():
     print(">> BLOQUE 1: CONSOLIDAR EXTRACTOS BANCARIOS")
     print("=" * 80 + "\n")
 
-    consolidar_bancos()
+    resultado = consolidar_bancos()
+
+    if resultado is not None:
+        df_consolidado, archivo_consolidado = resultado
+        # Guardar en la sesión
+        sesion_trabajo['archivo_consolidado'] = archivo_consolidado
+        sesion_trabajo['archivo_categorizado'] = None  # Resetear categorizado
+        sesion_trabajo['archivos_input_usados'] = ['Todos los archivos de ./input']
+
+        print("\n" + "=" * 80)
+        print("[SESION ACTUALIZADA]")
+        print(f"Archivo listo para CATEGORIZAR (Opcion 4)")
+        print("=" * 80)
 
     input("\nPresiona ENTER para volver al menú principal...")
 
@@ -155,7 +187,23 @@ def solo_categorizar():
     print(">>  BLOQUE 2: CATEGORIZAR MOVIMIENTOS")
     print("=" * 80 + "\n")
 
-    categorizar_movimientos()
+    # Usar archivo de la sesión si existe
+    archivo_a_usar = sesion_trabajo.get('archivo_consolidado')
+
+    if archivo_a_usar:
+        print(f"[SESION] Usando archivo consolidado: {os.path.basename(archivo_a_usar)}\n")
+
+    resultado = categorizar_movimientos(ruta_archivo_consolidado=archivo_a_usar)
+
+    if resultado is not None:
+        df_categorizado, archivo_categorizado = resultado
+        # Guardar en la sesión
+        sesion_trabajo['archivo_categorizado'] = archivo_categorizado
+
+        print("\n" + "=" * 80)
+        print("[SESION ACTUALIZADA]")
+        print(f"Archivo listo para generar REPORTES (Opcion 5)")
+        print("=" * 80)
 
     input("\nPresiona ENTER para volver al menú principal...")
 
@@ -166,7 +214,13 @@ def solo_reportes():
     print(">> BLOQUE 3: GENERAR REPORTES Y DASHBOARD")
     print("=" * 80 + "\n")
 
-    generar_reportes()
+    # Usar archivo de la sesión si existe
+    archivo_a_usar = sesion_trabajo.get('archivo_categorizado')
+
+    if archivo_a_usar:
+        print(f"[SESION] Usando archivo categorizado: {os.path.basename(archivo_a_usar)}\n")
+
+    generar_reportes(ruta_archivo_categorizado=archivo_a_usar)
 
     input("\nPresiona ENTER para volver al menú principal...")
 
@@ -320,6 +374,40 @@ def seleccionar_archivos_excel():
         return None
 
 
+def limpiar_sesion():
+    """Limpia la sesión de trabajo actual."""
+    print("\n" + "=" * 80)
+    print(">> LIMPIAR SESION DE TRABAJO")
+    print("=" * 80 + "\n")
+
+    if not sesion_trabajo['archivo_consolidado'] and not sesion_trabajo['archivo_categorizado']:
+        print("[INFO] No hay sesión activa. Nada que limpiar.")
+        input("\nPresiona ENTER para volver al menú principal...")
+        return
+
+    print("Sesión actual:")
+    if sesion_trabajo['archivos_input_usados']:
+        print(f"  Archivos input: {', '.join(sesion_trabajo['archivos_input_usados'])}")
+    if sesion_trabajo['archivo_consolidado']:
+        print(f"  Consolidado: {os.path.basename(sesion_trabajo['archivo_consolidado'])}")
+    if sesion_trabajo['archivo_categorizado']:
+        print(f"  Categorizado: {os.path.basename(sesion_trabajo['archivo_categorizado'])}")
+
+    print("\nEsto permitirá iniciar un nuevo proceso desde cero.")
+    confirmacion = input("\n¿Deseas limpiar la sesión? (S/N): ").strip().upper()
+
+    if confirmacion in ['S', 'SI', 'Y', 'YES']:
+        sesion_trabajo['archivo_consolidado'] = None
+        sesion_trabajo['archivo_categorizado'] = None
+        sesion_trabajo['archivos_input_usados'] = []
+
+        print("\n[OK] Sesión limpiada. Puedes iniciar un nuevo proceso.")
+    else:
+        print("\n[INFO] Sesión no modificada.")
+
+    input("\nPresiona ENTER para volver al menú principal...")
+
+
 def consolidar_con_seleccion():
     """Ejecuta consolidación con selección manual de archivos."""
     print("\n" + "=" * 80)
@@ -338,7 +426,19 @@ def consolidar_con_seleccion():
     print("PROCESANDO ARCHIVOS SELECCIONADOS")
     print("=" * 80 + "\n")
 
-    consolidar_bancos(archivos_seleccionados=archivos_seleccionados)
+    resultado = consolidar_bancos(archivos_seleccionados=archivos_seleccionados)
+
+    if resultado is not None:
+        df_consolidado, archivo_consolidado = resultado
+        # Guardar en la sesión
+        sesion_trabajo['archivo_consolidado'] = archivo_consolidado
+        sesion_trabajo['archivo_categorizado'] = None  # Resetear categorizado
+        sesion_trabajo['archivos_input_usados'] = archivos_seleccionados
+
+        print("\n" + "=" * 80)
+        print("[SESION ACTUALIZADA]")
+        print(f"Archivo listo para CATEGORIZAR (Opcion 4)")
+        print("=" * 80)
 
     input("\nPresiona ENTER para volver al menú principal...")
 
@@ -379,6 +479,9 @@ def main():
 
             elif opcion == '7':
                 informacion_sistema()
+
+            elif opcion == '8':
+                limpiar_sesion()
 
             else:
                 print("\n[ERROR] Opción inválida. Por favor selecciona una opción del menú.")

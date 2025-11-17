@@ -73,7 +73,7 @@
         }
 
         .card.variacion {
-            border-color: #dc3545;
+            border-color: #28a745;
         }
 
         .card.clasificados {
@@ -86,6 +86,22 @@
 
         .card.saldo-final {
             border-color: #17a2b8;
+        }
+
+        .card.debin {
+            border-color: #28a745;
+        }
+
+        .card.prestadores {
+            border-color: #e83e8c;
+        }
+
+        .card.mayor-egreso {
+            border-color: #dc3545;
+        }
+
+        .card.mayor-ingreso {
+            border-color: #20c997;
         }
 
         .card-title {
@@ -111,7 +127,7 @@
         }
 
         .card.variacion .card-value {
-            color: #dc3545;
+            color: #28a745;
         }
 
         .card.clasificados .card-value {
@@ -124,6 +140,22 @@
 
         .card.saldo-final .card-value {
             color: #17a2b8;
+        }
+
+        .card.debin .card-value {
+            color: #28a745;
+        }
+
+        .card.prestadores .card-value {
+            color: #e83e8c;
+        }
+
+        .card.mayor-egreso .card-value {
+            color: #dc3545;
+        }
+
+        .card.mayor-ingreso .card-value {
+            color: #20c997;
         }
 
         .card-subtitle {
@@ -193,6 +225,55 @@
             color: #721c24;
         }
 
+        .alert-info {
+            background-color: #d1ecf1;
+            border-color: #17a2b8;
+            color: #0c5460;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+
+        .summary-table {
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        .summary-table th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: right;
+        }
+
+        .summary-table th:first-child {
+            text-align: left;
+        }
+
+        .summary-table td {
+            padding: 10px;
+            text-align: right;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .summary-table td:first-child {
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .summary-table .neto-positivo {
+            color: #28a745;
+            font-weight: 600;
+        }
+
+        .summary-table .neto-negativo {
+            color: #dc3545;
+            font-weight: 600;
+        }
+
         .footer {
             background: #f8f9fa;
             padding: 20px;
@@ -216,29 +297,31 @@
     <div class="container">
         <div class="header">
             <h1>SANARTE - Dashboard Financiero</h1>
-            <p>Generado el 15/11/2025 01:12</p>
+            <p>Generado el 17/11/2025 16:49</p>
         </div>
 
         <div class="content">
-            <!-- Alertas -->
-            <div class="alert alert-danger"><strong>ALERTA:</strong> Los egresos superan a los ingresos en este período.</div>
-            <div class="alert"><strong>ADVERTENCIA:</strong> Diferencia en validación de saldos: $5,248,790.47. El saldo final no coincide con la fórmula esperada.</div>
+            <!-- Alertas Inteligentes -->
+            <div class="alert alert-info"><strong>📊 Buena clasificación:</strong> 485 de 506 clasificadas (95.8%)</div>
+<div class="alert alert-info"><strong>📊 Red prestacional:</strong> 7 prestadores activos este mes ($4,271,146 total)</div>
+<div class="alert alert-info"><strong>💳 Ingresos por DEBIN:</strong> 21 transacciones por $5,237,444 (promedio $249,402)</div>
+<div class="alert alert-warning"><strong>⚠️ ADVERTENCIA:</strong> Diferencia en validación de saldos: $1,362,667.73. El saldo final no coincide con la fórmula esperada.</div>
 
             <!-- Cards de métricas principales -->
             <div class="cards">
                 <div class="card saldo-inicial">
                     <div class="card-title">Saldo Inicial</div>
-                    <div class="card-value">$607.82</div>
+                    <div class="card-value">$2,257.82</div>
                 </div>
 
                 <div class="card ingresos">
                     <div class="card-title">Total Ingresos</div>
-                    <div class="card-value">$5,347,127.34</div>
+                    <div class="card-value">$24,094,260.91</div>
                 </div>
 
                 <div class="card egresos">
                     <div class="card-title">Total Egresos</div>
-                    <div class="card-value">$9,259,854.01</div>
+                    <div class="card-value">$21,397,179.38</div>
                 </div>
 
                 <div class="card saldo-final">
@@ -248,13 +331,37 @@
 
                 <div class="card variacion">
                     <div class="card-title">Variación del Mes</div>
-                    <div class="card-value">$-3,912,726.67</div>
+                    <div class="card-value">$2,697,081.53</div>
                 </div>
 
                 <div class="card clasificados">
                     <div class="card-title">Movimientos Clasificados</div>
-                    <div class="card-value">83.6%</div>
-                    <div class="card-subtitle">423 de 506</div>
+                    <div class="card-value">95.8%</div>
+                    <div class="card-subtitle">485 de 506</div>
+                </div>
+
+                <div class="card debin">
+                    <div class="card-title">💳 Ingresos DEBIN</div>
+                    <div class="card-value">$5,237,443.81</div>
+                    <div class="card-subtitle">21 transacciones</div>
+                </div>
+
+                <div class="card prestadores">
+                    <div class="card-title">👥 Prestadores Activos</div>
+                    <div class="card-value">7</div>
+                    <div class="card-subtitle">Total pagado: $4,271,146</div>
+                </div>
+
+                <div class="card mayor-egreso">
+                    <div class="card-title">💰 Mayor Categoría Egreso</div>
+                    <div class="card-value">$8,239,556</div>
+                    <div class="card-subtitle">Egresos - Transferencias Varia (38.5%)</div>
+                </div>
+
+                <div class="card mayor-ingreso">
+                    <div class="card-title">📊 Mayor Categoría Ingreso</div>
+                    <div class="card-value">$9,789,544</div>
+                    <div class="card-subtitle">Ingresos - Transferencias (40.6%)</div>
                 </div>
             </div>
 
@@ -268,7 +375,7 @@
 
                 <!-- Gráfico de Egresos -->
                 <div class="chart-container">
-                    <div class="chart-title">Egresos por Categoría</div>
+                    <div class="chart-title">Top 10 Egresos por Categoría</div>
                     <canvas id="chartEgresos"></canvas>
                 </div>
 
@@ -277,6 +384,25 @@
                     <div class="chart-title">Flujo de Caja Diario</div>
                     <canvas id="chartFlujo"></canvas>
                 </div>
+            </div>
+
+            <!-- Tabla Resumen por Categoría Principal -->
+            <div class="chart-container chart-full">
+                <div class="chart-title">📊 Resumen por Categoría Principal</div>
+                <table class="summary-table">
+                    <thead>
+                        <tr>
+                            <th>Categoría</th>
+                            <th>Transacciones</th>
+                            <th>Ingresos</th>
+                            <th>Egresos</th>
+                            <th>Neto</th>
+                        </tr>
+                    </thead>
+                    <tbody id="summaryTableBody">
+                        <!-- Generado dinámicamente por JavaScript -->
+                    </tbody>
+                </table>
             </div>
 
             <!-- Tabla de Top Prestadores -->
@@ -295,62 +421,44 @@
         
                     <tr>
                         <td>1</td>
-                        <td>BUSTOS RODRIGO TOMAS</td>
-                        <td>$1,500,000.00</td>
-                    </tr>
-            
-                    <tr>
-                        <td>2</td>
-                        <td>ALVAREZ MIRIAM ANALIA</td>
-                        <td>$1,019,048.00</td>
-                    </tr>
-            
-                    <tr>
-                        <td>3</td>
                         <td>TOSIN SONIA BEATRIZ</td>
                         <td>$600,000.00</td>
                     </tr>
             
                     <tr>
-                        <td>4</td>
-                        <td>TOSIN GUADALUPE ANAHI</td>
-                        <td>$600,000.00</td>
-                    </tr>
-            
-                    <tr>
-                        <td>5</td>
+                        <td>2</td>
                         <td>TOSIN MARCO ANTONIO</td>
                         <td>$600,000.00</td>
                     </tr>
             
                     <tr>
-                        <td>6</td>
-                        <td>SUAREZ IVANA AYELEN</td>
-                        <td>$375,000.00</td>
+                        <td>3</td>
+                        <td>TOSIN GUADALUPE ANAHI</td>
+                        <td>$600,000.00</td>
                     </tr>
             
                     <tr>
-                        <td>7</td>
-                        <td>CRESPO GUSTAVO MARTIN</td>
-                        <td>$350,000.00</td>
-                    </tr>
-            
-                    <tr>
-                        <td>8</td>
-                        <td>CABRAL CRISTIAN MATIAS</td>
-                        <td>$304,500.00</td>
-                    </tr>
-            
-                    <tr>
-                        <td>9</td>
+                        <td>4</td>
                         <td>DECADE S</td>
                         <td>$204,254.00</td>
                     </tr>
             
                     <tr>
-                        <td>10</td>
-                        <td>ALVAREZ MATIAS GABRIEL</td>
-                        <td>$200,000.00</td>
+                        <td>5</td>
+                        <td>FARMACIAS LIDER S</td>
+                        <td>$193,558.00</td>
+                    </tr>
+            
+                    <tr>
+                        <td>6</td>
+                        <td>FRANDINO ROMINA LAURA</td>
+                        <td>$153,227.00</td>
+                    </tr>
+            
+                    <tr>
+                        <td>7</td>
+                        <td>BERNARDI ELIANA GABRIELA</td>
+                        <td>$150,000.00</td>
                     </tr>
             
                 </tbody>
@@ -361,7 +469,7 @@
             <!-- Tabla de Movimientos Sin Clasificar -->
             
         <div class="chart-container">
-            <div class="chart-title">Movimientos Sin Clasificar (83)</div>
+            <div class="chart-title">Movimientos Sin Clasificar (21)</div>
             <table>
                 <thead>
                     <tr>
@@ -374,58 +482,51 @@
                 <tbody>
         
                     <tr>
-                        <td>2025-10-31 16:06:56</td>
-                        <td>Crédito por Transferencia</td>
+                        <td>2025-10-31 00:00:00</td>
+                        <td>Transferencia Recibida</td>
+                        <td>$76,473.46</td>
                         <td>$0.00</td>
-                        <td>$13,400.00</td>
-                    </tr>
-            
-                    <tr>
-                        <td>2025-10-30 13:37:28</td>
-                        <td>Crédito por Transferencia</td>
-                        <td>$0.00</td>
-                        <td>$8,900.00</td>
                     </tr>
             
                     <tr>
                         <td>2025-10-29 18:50:58</td>
-                        <td>Acreditación Cheque Dep.48 Hs.</td>
-                        <td>$0.00</td>
-                        <td>$550,715.43</td>
-                    </tr>
-            
-                    <tr>
-                        <td>2025-10-27 21:28:58</td>
-                        <td>Débito Automático de Servicio</td>
-                        <td>$43,948.90</td>
+                        <td>I.V.A. Percep. Resp. Inscripto</td>
+                        <td>$181.74</td>
                         <td>$0.00</td>
                     </tr>
             
                     <tr>
-                        <td>2025-10-25 13:01:41</td>
-                        <td>Crédito por Transferencia</td>
+                        <td>2025-10-29 00:00:00</td>
+                        <td>Transferencia Recibida</td>
+                        <td>$71,340.06</td>
                         <td>$0.00</td>
-                        <td>$324,680.00</td>
                     </tr>
             
                     <tr>
-                        <td>2025-10-24 13:21:57</td>
-                        <td>Crédito por Transferencia</td>
+                        <td>2025-10-29 00:00:00</td>
+                        <td>Comisión Mantenimiento</td>
+                        <td>$76,122.52</td>
                         <td>$0.00</td>
-                        <td>$51,205.00</td>
+                    </tr>
+            
+                    <tr>
+                        <td>2025-10-27 00:00:00</td>
+                        <td>Comisión Mantenimiento</td>
+                        <td>$0.00</td>
+                        <td>$83,382.43</td>
+                    </tr>
+            
+                    <tr>
+                        <td>2025-10-24 14:13:04</td>
+                        <td>CRED BCA ELECTR INTERBANC EXEN</td>
+                        <td>$0.00</td>
+                        <td>$54,000.00</td>
                     </tr>
             
                     <tr>
                         <td>2025-10-24 00:00:00</td>
                         <td>Transf Inmed Cp</td>
                         <td>$54,000.00</td>
-                        <td>$0.00</td>
-                    </tr>
-            
-                    <tr>
-                        <td>2025-10-23 21:10:28</td>
-                        <td>Débito Automático de Servicio</td>
-                        <td>$27,536.33</td>
                         <td>$0.00</td>
                     </tr>
             
@@ -437,55 +538,6 @@
                     </tr>
             
                     <tr>
-                        <td>2025-10-22 14:59:09</td>
-                        <td>Crédito por Transferencia</td>
-                        <td>$0.00</td>
-                        <td>$75,000.00</td>
-                    </tr>
-            
-                    <tr>
-                        <td>2025-10-22 14:22:06</td>
-                        <td>Crédito por Transferencia</td>
-                        <td>$0.00</td>
-                        <td>$426,042.00</td>
-                    </tr>
-            
-                    <tr>
-                        <td>2025-10-22 00:00:00</td>
-                        <td>Débito por Pago Sueldos</td>
-                        <td>$40,198.57</td>
-                        <td>$0.00</td>
-                    </tr>
-            
-                    <tr>
-                        <td>2025-10-21 21:06:59</td>
-                        <td>Com.Cheque Pagado por clearing</td>
-                        <td>$550.00</td>
-                        <td>$0.00</td>
-                    </tr>
-            
-                    <tr>
-                        <td>2025-10-21 21:06:59</td>
-                        <td>Com.Cheque Pagado por clearing</td>
-                        <td>$550.00</td>
-                        <td>$0.00</td>
-                    </tr>
-            
-                    <tr>
-                        <td>2025-10-21 03:56:55</td>
-                        <td>Pago Cheque de Cámara Recibida</td>
-                        <td>$276,911.50</td>
-                        <td>$0.00</td>
-                    </tr>
-            
-                    <tr>
-                        <td>2025-10-21 03:56:55</td>
-                        <td>Pago Cheque de Cámara Recibida</td>
-                        <td>$746,600.00</td>
-                        <td>$0.00</td>
-                    </tr>
-            
-                    <tr>
                         <td>2025-10-21 00:00:00</td>
                         <td>Pago Electronico</td>
                         <td>$65,421.35</td>
@@ -493,29 +545,85 @@
                     </tr>
             
                     <tr>
-                        <td>2025-10-20 15:38:48</td>
-                        <td>Crédito por Transferencia</td>
-                        <td>$0.00</td>
-                        <td>$391,920.00</td>
-                    </tr>
-            
-                    <tr>
-                        <td>2025-10-18 00:00:00</td>
-                        <td>Crédito por Transferencia</td>
-                        <td>$106,986.65</td>
+                        <td>2025-10-19 00:00:00</td>
+                        <td>Comisión Mantenimiento</td>
+                        <td>$87,201.15</td>
                         <td>$0.00</td>
                     </tr>
             
                     <tr>
-                        <td>2025-10-17 21:16:44</td>
-                        <td>Débito Automático de Servicio</td>
-                        <td>$137,305.04</td>
+                        <td>2025-10-17 00:00:00</td>
+                        <td>Imp. Cre. Ley 25413</td>
+                        <td>$80.40</td>
+                        <td>$0.00</td>
+                    </tr>
+            
+                    <tr>
+                        <td>2025-10-17 00:00:00</td>
+                        <td>Nave Pago Con Transferencia</td>
+                        <td>$0.00</td>
+                        <td>$13,400.00</td>
+                    </tr>
+            
+                    <tr>
+                        <td>2025-10-17 00:00:00</td>
+                        <td>Comisión Mantenimiento</td>
+                        <td>$0.00</td>
+                        <td>$27,392.11</td>
+                    </tr>
+            
+                    <tr>
+                        <td>2025-10-13 00:00:00</td>
+                        <td>Transf. A Terceros</td>
+                        <td>$300,000.00</td>
+                        <td>$0.00</td>
+                    </tr>
+            
+                    <tr>
+                        <td>2025-10-13 00:00:00</td>
+                        <td>Transf. A Terceros</td>
+                        <td>$280,000.00</td>
+                        <td>$0.00</td>
+                    </tr>
+            
+                    <tr>
+                        <td>2025-10-13 00:00:00</td>
+                        <td>Imp. Deb. Ley 25413 Gral.</td>
+                        <td>$3,480.00</td>
+                        <td>$0.00</td>
+                    </tr>
+            
+                    <tr>
+                        <td>2025-10-03 00:00:00</td>
+                        <td>Transferencia De Cuenta Propia</td>
+                        <td>$0.00</td>
+                        <td>$691,008.00</td>
+                    </tr>
+            
+                    <tr>
+                        <td>2025-10-01 21:02:09</td>
+                        <td>Comisión Riesgo Contigente</td>
+                        <td>$400.00</td>
+                        <td>$0.00</td>
+                    </tr>
+            
+                    <tr>
+                        <td>2025-10-01 20:09:45</td>
+                        <td>I.V.A. Percep. Resp. Inscripto</td>
+                        <td>$1,320.00</td>
+                        <td>$0.00</td>
+                    </tr>
+            
+                    <tr>
+                        <td>2025-10-01 00:00:00</td>
+                        <td>Imp. Deb. Ley 25413 Gral.</td>
+                        <td>$409.20</td>
                         <td>$0.00</td>
                     </tr>
             
                     <tr>
                         <td colspan="4" style="text-align: center; color: #999;">
-                            ... y 63 más
+                            ... y 1 más
                         </td>
                     </tr>
             
@@ -532,9 +640,25 @@
 
     <script>
         // Datos para gráficos
-        const datosIngresos = {"labels": ["Afiliados DEBIN", "Otros Ingresos", "Pacientes Transferencia"], "values": [5291443.8100000005, 55683.53, 0.0]};
-        const datosEgresos = {"labels": ["Comisiones Bancarias", "Gastos Operativos", "Impuestos", "Prestadores", "Servicios", "Sueldos"], "values": [330101.89, 1581480.67, 500006.05, 6356029.0, 492236.4, 0.0]};
-        const datosFlujo = {"labels": ["2025-10-01", "2025-10-02", "2025-10-03", "2025-10-04", "2025-10-05", "2025-10-06", "2025-10-07", "2025-10-08", "2025-10-09", "2025-10-10", "2025-10-11", "2025-10-12", "2025-10-13", "2025-10-14", "2025-10-15", "2025-10-16", "2025-10-17", "2025-10-18", "2025-10-19", "2025-10-20", "2025-10-21", "2025-10-22", "2025-10-23", "2025-10-24", "2025-10-25", "2025-10-26", "2025-10-27", "2025-10-28", "2025-10-29", "2025-10-30", "2025-10-31"], "ingresos": [75000.0, 0.0, 175000.0, 0.0, 0.0, 0.0, 0.0, 135000.0, 132469.0, 346998.0, 0.0, 0.0, 39892.0, 1171867.0, 53245.0, 160177.0, 3522.75, 0.0, 0.0, 846092.51, 313409.14, 0.0, 672000.0, 495000.0, 0.0, 0.0, 164000.0, 0.0, 230000.0, 267500.0, 65954.94], "egresos": [220937.69999999998, 308395.99, 242600.8, 83754.79, 41366.72, 11265.470000000001, 29840.73, 657425.47, 1359217.8099999998, 181624.03, 48216.32, 61068.770000000004, 17632.86, 206805.53999999998, 1719071.15, 3764.5699999999997, 154991.22, 5522.94, 163660.26, 688669.78, 232417.92, 317103.28, 20668.559999999998, 2078435.55, 65135.04, 10319.789999999999, 85549.01000000001, 32278.01, 86983.64, 125037.58, 92.71000000000001]};
+        const datosIngresos = {"labels": ["Ingresos - Transferencias", "Ingresos - DEBIN Afiliados", "Ingresos - Cheques", "Ingresos - Obras Sociales", "Sin Clasificar - Requiere Revisi\u00f3n", "Gastos Operativos - Sueldos", "Ingresos - Devoluciones", "Ingresos - Descuentos", "Impuestos - Devoluciones", "Ingresos - Intereses", "Impuestos - IVA"], "values": [9789544.16, 5237443.8100000005, 4550715.43, 3441060.62, 869182.54, 83754.66, 66821.97, 55683.53, 54.12, 0.06, 0.01]};
+        const datosEgresos = {"labels": ["Egresos - Transferencias Varias", "Gastos Operativos - Sueldos", "Prestadores - Profesionales", "Prestadores - Pagos", "Gastos Operativos - Vi\u00e1ticos", "Sin Clasificar - Requiere Revisi\u00f3n", "Ingresos - Tarjetas", "Impuestos - AFIP", "Egresos - DEBIN", "Servicios - Electricidad"], "values": [8239556.0, 2440198.57, 2307481.0, 1770107.5, 1300801.36, 1114486.93, 899196.71, 627430.19, 470000.0, 403456.4]};
+        const datosFlujo = {"labels": ["2025-10-01", "2025-10-02", "2025-10-03", "2025-10-04", "2025-10-05", "2025-10-06", "2025-10-07", "2025-10-08", "2025-10-09", "2025-10-10", "2025-10-11", "2025-10-12", "2025-10-13", "2025-10-14", "2025-10-15", "2025-10-16", "2025-10-17", "2025-10-18", "2025-10-19", "2025-10-20", "2025-10-21", "2025-10-22", "2025-10-23", "2025-10-24", "2025-10-25", "2025-10-26", "2025-10-27", "2025-10-28", "2025-10-29", "2025-10-30", "2025-10-31"], "ingresos": [4075000.07, 259799.0, 175000.0, 0.0, 0.0, 458483.0, 660392.27, 506948.5, 4518186.74, 516997.0, 0.0, 25319.0, 504291.07, 5601229.22, 258149.0, 160177.0, 463960.75, 0.0, 0.0, 1238012.51, 324651.76, 501042.0, 776329.45, 492205.0, 324680.0, 83754.66, 164000.0, 0.0, 780715.43, 276400.0, 79354.94], "egresos": [182187.55, 1075541.99, 2476363.51, 83754.79, 41366.72, 11265.470000000001, 29840.73, 657425.47, 3759217.81, 181624.03, 48216.32, 61068.770000000004, 17632.86, 3719583.33, 1719071.15, 631194.76, 292296.26, 112509.59, 76459.11, 688669.78, 1257029.42, 357301.85, 48204.89, 2175953.2800000003, 109053.33, 10319.789999999999, 129497.91, 90283.89, 10679.38, 228986.0, 92.71000000000001]};
+        const resumenCategorias = [{"categoria": "Egresos", "transacciones": 14, "ingresos": 0.0, "egresos": 8709556.0, "neto": -8709556.0}, {"categoria": "Prestadores", "transacciones": 10, "ingresos": 0.0, "egresos": 4271146.5, "neto": -4271146.5}, {"categoria": "Gastos Operativos", "transacciones": 89, "ingresos": 83754.66, "egresos": 3943021.25, "neto": -3859266.59}, {"categoria": "Ingresos", "transacciones": 83, "ingresos": 23141269.58, "egresos": 1309573.68, "neto": 21831695.9}, {"categoria": "Impuestos", "transacciones": 265, "ingresos": 54.129999999999995, "egresos": 1125934.5, "neto": -1125880.37}, {"categoria": "Servicios", "transacciones": 10, "ingresos": 0.0, "egresos": 779684.6599999999, "neto": -779684.6599999999}, {"categoria": "Comisiones Bancarias", "transacciones": 14, "ingresos": 0.0, "egresos": 143775.86000000002, "neto": -143775.86000000002}];
+
+        // Llenar tabla de resumen por categoría principal
+        const summaryTableBody = document.getElementById('summaryTableBody');
+        resumenCategorias.forEach(cat => {
+            const row = document.createElement('tr');
+            const netoClass = cat.neto >= 0 ? 'neto-positivo' : 'neto-negativo';
+            row.innerHTML = `
+                <td>${cat.categoria}</td>
+                <td>${cat.transacciones.toLocaleString('es-AR')}</td>
+                <td>$${cat.ingresos.toLocaleString('es-AR', {minimumFractionDigits: 0, maximumFractionDigits: 0})}</td>
+                <td>$${cat.egresos.toLocaleString('es-AR', {minimumFractionDigits: 0, maximumFractionDigits: 0})}</td>
+                <td class="${netoClass}">$${cat.neto.toLocaleString('es-AR', {minimumFractionDigits: 0, maximumFractionDigits: 0})}</td>
+            `;
+            summaryTableBody.appendChild(row);
+        });
 
         // Gráfico de Ingresos (Torta)
         new Chart(document.getElementById('chartIngresos'), {
@@ -576,7 +700,7 @@
             }
         });
 
-        // Gráfico de Egresos (Torta)
+        // Gráfico de Egresos (Torta - Top 10)
         new Chart(document.getElementById('chartEgresos'), {
             type: 'pie',
             data: {
@@ -584,12 +708,16 @@
                 datasets: [{
                     data: datosEgresos.values,
                     backgroundColor: [
-                        '#dc3545',
-                        '#fd7e14',
-                        '#ffc107',
-                        '#e83e8c',
-                        '#6f42c1',
-                        '#6c757d'
+                        '#dc3545', // Rojo
+                        '#fd7e14', // Naranja
+                        '#ff6b6b', // Rojo claro
+                        '#e83e8c', // Rosa
+                        '#9b59b6', // Púrpura
+                        '#ffc107', // Amarillo
+                        '#f39c12', // Naranja oscuro
+                        '#17a2b8', // Azul
+                        '#3498db', // Azul claro
+                        '#6c757d'  // Gris
                     ],
                     borderWidth: 2,
                     borderColor: '#fff'

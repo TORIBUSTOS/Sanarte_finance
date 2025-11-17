@@ -52,6 +52,7 @@ class DashboardGenerator:
         egresos_por_categoria = self._calcular_egresos_por_categoria()
         kpis = self._calcular_kpis_adicionales()
         resumen_categorias = self._calcular_resumen_categorias()
+        alertas = self._generar_alertas()
 
         # Preparar datos para gráficos
         datos_ingresos = self._preparar_datos_torta(ingresos_por_categoria)
@@ -367,9 +368,8 @@ class DashboardGenerator:
         </div>
 
         <div class="content">
-            <!-- Alertas -->
-            {'<div class="alert alert-danger"><strong>ALERTA:</strong> Los egresos superan a los ingresos en este período.</div>' if self.metricas['alerta_egresos_mayores'] else ''}
-            {'<div class="alert"><strong>ADVERTENCIA:</strong> Diferencia en validación de saldos: $' + f"{self.metricas['diferencia_validacion']:,.2f}" + '. El saldo final no coincide con la fórmula esperada.</div>' if not self.metricas['validacion_saldos_ok'] else ''}
+            <!-- Alertas Inteligentes -->
+            {alertas}
 
             <!-- Cards de métricas principales -->
             <div class="cards">
@@ -688,6 +688,84 @@ class DashboardGenerator:
         egresos_por_cat = egresos_por_cat.sort_values(ascending=False).head(10)
 
         return egresos_por_cat.to_dict()
+
+    def _generar_alertas(self) -> str:
+        """
+        Genera alertas inteligentes HTML basadas en los datos.
+
+        Returns:
+            String HTML con alertas
+        """
+        alertas_html = []
+
+        # Alerta 1: Clasificación completa
+        pct_clasificado = self.metricas['porcentaje_clasificado']
+        if pct_clasificado == 100:
+            alertas_html.append(
+                '<div class="alert alert-success">'
+                f'<strong>✅ Sistema funcionando:</strong> {self.metricas["movimientos_clasificados"]} transacciones clasificadas (100%)'
+                '</div>'
+            )
+        elif pct_clasificado >= 95:
+            alertas_html.append(
+                '<div class="alert alert-info">'
+                f'<strong>📊 Buena clasificación:</strong> {self.metricas["movimientos_clasificados"]} de {self.metricas["total_movimientos"]} clasificadas ({pct_clasificado:.1f}%)'
+                '</div>'
+            )
+
+        # Alerta 2: Sueldos altos
+        df_sueldos = self.df[self.df['Categoria_Final'].str.contains('Sueldos', case=False, na=False)]
+        if len(df_sueldos) > 0:
+            total_sueldos = df_sueldos['Débito'].sum()
+            pct_sueldos = (total_sueldos / self.metricas['total_egresos'] * 100) if self.metricas['total_egresos'] > 0 else 0
+            if pct_sueldos > 20:
+                alertas_html.append(
+                    '<div class="alert alert-warning">'
+                    f'<strong>⚠️ Sueldos altos:</strong> Representan {pct_sueldos:.1f}% de egresos totales (${total_sueldos:,.0f})'
+                    '</div>'
+                )
+
+        # Alerta 3: Red prestacional
+        df_prestadores = self.df[self.df['Categoria_Principal'] == 'Prestadores']
+        if len(df_prestadores) > 0:
+            n_prestadores = df_prestadores['Persona_Nombre'].nunique()
+            total_prestadores = df_prestadores['Débito'].sum()
+            alertas_html.append(
+                '<div class="alert alert-info">'
+                f'<strong>📊 Red prestacional:</strong> {n_prestadores} prestadores activos este mes (${total_prestadores:,.0f} total)'
+                '</div>'
+            )
+
+        # Alerta 4: Ingresos DEBIN
+        if 'Es_DEBIN' in self.df.columns:
+            df_debin = self.df[(self.df['Tipo_Movimiento'] == 'Ingreso') & (self.df['Es_DEBIN'] == True)]
+            if len(df_debin) > 0:
+                total_debin = df_debin['Crédito'].sum()
+                promedio_debin = df_debin['Crédito'].mean()
+                alertas_html.append(
+                    '<div class="alert alert-info">'
+                    f'<strong>💳 Ingresos por DEBIN:</strong> {len(df_debin)} transacciones por ${total_debin:,.0f} (promedio ${promedio_debin:,.0f})'
+                    '</div>'
+                )
+
+        # Alerta 5: Egresos superan ingresos (ya existente)
+        if self.metricas['alerta_egresos_mayores']:
+            alertas_html.append(
+                '<div class="alert alert-danger">'
+                '<strong>⚠️ ALERTA:</strong> Los egresos superan a los ingresos en este período.'
+                '</div>'
+            )
+
+        # Alerta 6: Diferencia en validación (ya existente)
+        if not self.metricas['validacion_saldos_ok']:
+            alertas_html.append(
+                '<div class="alert alert-warning">'
+                f'<strong>⚠️ ADVERTENCIA:</strong> Diferencia en validación de saldos: ${self.metricas["diferencia_validacion"]:,.2f}. '
+                'El saldo final no coincide con la fórmula esperada.'
+                '</div>'
+            )
+
+        return '\n'.join(alertas_html)
 
     def _calcular_kpis_adicionales(self) -> Dict:
         """

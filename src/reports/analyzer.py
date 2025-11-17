@@ -61,8 +61,20 @@ class Analyzer:
         # Flujo diario
         flujo_diario = self._flujo_diario()
 
-        # Detectar alerta
-        alerta = total_egresos > total_ingresos
+        # Detectar alertas (AMPLIADO)
+        alerta_egresos_mayores = total_egresos > total_ingresos
+        alerta_muchos_sin_clasificar = porcentaje_clasificado < 80  # < 80% clasificados
+        alerta_categoria_excesiva = self._detectar_categoria_excesiva(egresos_por_sub, total_egresos)
+
+        # Generar mensajes de alertas dinámicas
+        alertas_dinamicas = self._generar_alertas_dinamicas(
+            alerta_egresos_mayores,
+            alerta_muchos_sin_clasificar,
+            alerta_categoria_excesiva,
+            porcentaje_clasificado,
+            egresos_por_sub,
+            total_egresos
+        )
 
         # Guardar métricas
         self.metricas = {
@@ -80,9 +92,13 @@ class Analyzer:
             'egresos_por_subcategoria': egresos_por_sub,
             'top_prestadores': top_prestadores,
             'flujo_diario': flujo_diario,
-            'alerta_egresos_mayores': alerta,
+            'alerta_egresos_mayores': alerta_egresos_mayores,
             'validacion_saldos_ok': validacion_ok,
-            'diferencia_validacion': diferencia
+            'diferencia_validacion': diferencia,
+            # Nuevas alertas
+            'alerta_muchos_sin_clasificar': alerta_muchos_sin_clasificar,
+            'alerta_categoria_excesiva': alerta_categoria_excesiva,
+            'alertas_dinamicas': alertas_dinamicas
         }
 
         # Mostrar resumen
@@ -299,3 +315,65 @@ class Analyzer:
             DataFrame con movimientos sin clasificar
         """
         return self.df[self.df['Categoria'] == 'Sin Clasificar'].copy()
+
+    def _detectar_categoria_excesiva(self, egresos_por_sub: Dict, total_egresos: float) -> Dict:
+        """
+        Detecta si alguna categoría de egresos representa más del 40% del total.
+
+        Args:
+            egresos_por_sub: Diccionario de egresos por subcategoría
+            total_egresos: Total de egresos
+
+        Returns:
+            Diccionario con 'activa' (bool) y 'categoria' (str), 'porcentaje' (float)
+        """
+        if total_egresos == 0:
+            return {'activa': False, 'categoria': '', 'porcentaje': 0}
+
+        for subcategoria, monto in egresos_por_sub.items():
+            porcentaje = (monto / total_egresos) * 100
+            if porcentaje > 40:
+                return {
+                    'activa': True,
+                    'categoria': subcategoria,
+                    'porcentaje': porcentaje
+                }
+
+        return {'activa': False, 'categoria': '', 'porcentaje': 0}
+
+    def _generar_alertas_dinamicas(self, alerta_egresos_mayores: bool,
+                                   alerta_muchos_sin_clasificar: bool,
+                                   alerta_categoria_excesiva: Dict,
+                                   porcentaje_clasificado: float,
+                                   egresos_por_sub: Dict,
+                                   total_egresos: float) -> List[Dict]:
+        """
+        Genera lista de alertas dinámicas para mostrar en el dashboard.
+
+        Returns:
+            Lista de diccionarios con 'tipo' y 'mensaje'
+        """
+        alertas = []
+
+        # Alerta 1: Egresos > Ingresos
+        if alerta_egresos_mayores:
+            alertas.append({
+                'tipo': 'danger',
+                'mensaje': 'Los egresos superan a los ingresos en este período.'
+            })
+
+        # Alerta 2: Muchos movimientos sin clasificar
+        if alerta_muchos_sin_clasificar:
+            alertas.append({
+                'tipo': 'warning',
+                'mensaje': f'Solo {porcentaje_clasificado:.1f}% de los movimientos están clasificados. Se recomienda revisar los movimientos sin clasificar.'
+            })
+
+        # Alerta 3: Categoría excesiva
+        if alerta_categoria_excesiva['activa']:
+            alertas.append({
+                'tipo': 'warning',
+                'mensaje': f'La categoría "{alerta_categoria_excesiva["categoria"]}" representa {alerta_categoria_excesiva["porcentaje"]:.1f}% del total de egresos. Considere revisar estos gastos.'
+            })
+
+        return alertas

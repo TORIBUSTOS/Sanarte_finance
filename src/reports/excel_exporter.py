@@ -41,10 +41,13 @@ class ExcelExporter:
             # Hoja 3: Egresos
             self._crear_hoja_egresos(writer)
 
-            # Hoja 4: Prestadores
+            # Hoja 4: Top Egresos (NUEVO)
+            self._crear_hoja_top_egresos(writer)
+
+            # Hoja 5: Prestadores
             self._crear_hoja_prestadores(writer)
 
-            # Hoja 5: Sin Clasificar
+            # Hoja 6: Sin Clasificar
             self._crear_hoja_sin_clasificar(writer)
 
         # Aplicar formato
@@ -85,16 +88,18 @@ class ExcelExporter:
             ['DESGLOSE INGRESOS', 'Monto'],
         ])
 
-        # Agregar ingresos por subcategoría
+        # Agregar ingresos por subcategoría (FILTRAR $0)
         for sub, monto in self.metricas['ingresos_por_subcategoria'].items():
-            datos.append([sub, f"${monto:,.2f}"])
+            if monto > 0:  # Solo mostrar categorías con monto > 0
+                datos.append([sub, f"${monto:,.2f}"])
 
         datos.append(['', ''])
         datos.append(['DESGLOSE EGRESOS', 'Monto'])
 
-        # Agregar egresos por subcategoría
+        # Agregar egresos por subcategoría (FILTRAR $0)
         for sub, monto in self.metricas['egresos_por_subcategoria'].items():
-            datos.append([sub, f"${monto:,.2f}"])
+            if monto > 0:  # Solo mostrar categorías con monto > 0
+                datos.append([sub, f"${monto:,.2f}"])
 
         # Crear DataFrame y exportar
         df_resumen = pd.DataFrame(datos, columns=['Concepto', 'Valor'])
@@ -208,6 +213,37 @@ class ExcelExporter:
         # Luego el detalle (después del resumen + una fila de separación)
         start_row = len(df_resumen) + 2
         df_export.to_excel(writer, sheet_name='Egresos', index=False, startrow=start_row)
+
+    def _crear_hoja_top_egresos(self, writer):
+        """
+        Crea la hoja de top 10 egresos más grandes.
+        """
+        df_egresos = self.df[self.df['Categoria'] == 'Egresos'].copy()
+
+        if len(df_egresos) == 0:
+            pd.DataFrame(['No hay egresos registrados']).to_excel(writer, sheet_name='Top Egresos', index=False, header=False)
+            return
+
+        # Ordenar por débito descendente y tomar top 10
+        df_top = df_egresos.nlargest(10, 'Débito')
+
+        # Crear DataFrame de top egresos con columnas relevantes
+        datos = []
+        for i, (_, row) in enumerate(df_top.iterrows(), 1):
+            datos.append({
+                'Ranking': i,
+                'Fecha': row['Fecha'],
+                'Concepto': row['Concepto'],
+                'Detalle': row['Detalle'][:50] + '...' if len(str(row['Detalle'])) > 50 else row['Detalle'],
+                'Monto': row['Débito'],
+                'Subcategoría': row['Subcategoria'],
+                'Banco': row['Banco']
+            })
+
+        df_top_egresos = pd.DataFrame(datos)
+
+        # Exportar
+        df_top_egresos.to_excel(writer, sheet_name='Top Egresos', index=False)
 
     def _crear_hoja_prestadores(self, writer):
         """

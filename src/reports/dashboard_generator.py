@@ -277,8 +277,8 @@ class DashboardGenerator:
         </div>
 
         <div class="content">
-            <!-- Alertas -->
-            {'<div class="alert alert-danger"><strong>ALERTA:</strong> Los egresos superan a los ingresos en este período.</div>' if self.metricas['alerta_egresos_mayores'] else ''}
+            <!-- Alertas Dinámicas (MEJORADO) -->
+            {self._generar_alertas_html()}
             {'<div class="alert"><strong>ADVERTENCIA:</strong> Diferencia en validación de saldos: $' + f"{self.metricas['diferencia_validacion']:,.2f}" + '. El saldo final no coincide con la fórmula esperada.</div>' if not self.metricas['validacion_saldos_ok'] else ''}
 
             <!-- Cards de métricas principales -->
@@ -581,6 +581,23 @@ class DashboardGenerator:
 
         return html
 
+    def _generar_alertas_html(self) -> str:
+        """
+        Genera HTML para alertas dinámicas.
+
+        Returns:
+            String HTML con las alertas
+        """
+        if 'alertas_dinamicas' not in self.metricas or len(self.metricas['alertas_dinamicas']) == 0:
+            return ""
+
+        html = ""
+        for alerta in self.metricas['alertas_dinamicas']:
+            clase = 'alert-danger' if alerta['tipo'] == 'danger' else 'alert'
+            html += f'<div class="alert {clase}"><strong>{"ALERTA" if alerta["tipo"] == "danger" else "ADVERTENCIA"}:</strong> {alerta["mensaje"]}</div>\n'
+
+        return html
+
     def _generar_tabla_sin_clasificar(self) -> str:
         """
         Genera HTML de la tabla de movimientos sin clasificar.
@@ -635,5 +652,22 @@ class DashboardGenerator:
             </table>
         </div>
         """
+
+        return html
+
+    def _generar_alertas_html(self) -> str:
+        """
+        Genera HTML para alertas dinámicas.
+
+        Returns:
+            String HTML con las alertas
+        """
+        if 'alertas_dinamicas' not in self.metricas or len(self.metricas['alertas_dinamicas']) == 0:
+            return ""
+
+        html = ""
+        for alerta in self.metricas['alertas_dinamicas']:
+            clase = 'alert-danger' if alerta['tipo'] == 'danger' else 'alert'
+            html += f'<div class="alert {clase}"><strong>{"ALERTA" if alerta["tipo"] == "danger" else "ADVERTENCIA"}:</strong> {alerta["mensaje"]}</div>\n'
 
         return html

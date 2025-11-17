@@ -509,8 +509,11 @@ class DashboardGenerator:
         if not datos:
             return json.dumps({'labels': [], 'values': []})
 
-        labels = list(datos.keys())
-        values = list(datos.values())
+        # FILTRAR categorías con monto > 0
+        datos_filtrados = {k: v for k, v in datos.items() if v > 0}
+
+        labels = list(datos_filtrados.keys())
+        values = list(datos_filtrados.values())
 
         return json.dumps({
             'labels': labels,

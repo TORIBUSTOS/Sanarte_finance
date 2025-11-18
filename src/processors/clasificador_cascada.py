@@ -177,24 +177,16 @@ class ClasificadorCascada:
             - categoria_final: Categoría completa refinada (ej: "Servicios - Agua")
             - confianza: 0-100, donde 100 = clasificado, 0 = sin clasificar
         """
-        # DEBUG: Imprimir primeros 3 movimientos para verificar datos
-        if not hasattr(self, '_debug_count'):
-            self._debug_count = 0
-
-        if self._debug_count < 3:
-            print(f"\nDEBUG Movimiento {self._debug_count + 1}:")
-            print(f"  Concepto: {concepto[:50]}")
-            print(f"  Débito: {debito} (tipo: {type(debito).__name__})")
-            print(f"  Crédito: {credito} (tipo: {type(credito).__name__})")
-            self._debug_count += 1
-
         # 1. Determinar tipo de movimiento
-        if credito > 0:
+        # Usar umbral de 0.01 para evitar valores microscópicos (ej: 5e-324 del Excel)
+        UMBRAL_MINIMO = 0.01  # 1 centavo
+
+        if credito >= UMBRAL_MINIMO:
             tipo_movimiento = "Ingreso"
-        elif debito > 0:
+        elif debito >= UMBRAL_MINIMO:
             tipo_movimiento = "Egreso"
         else:
-            # Caso raro: ambos son 0
+            # Ambos son 0 o valores insignificantes
             tipo_movimiento = "Neutro"
 
         # 2. Normalizar campos

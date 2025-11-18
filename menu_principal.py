@@ -16,6 +16,56 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 from main import consolidar_bancos, categorizar_movimientos, generar_reportes
+from glob import glob
+
+
+def seleccionar_archivo_input():
+    """
+    Muestra archivos disponibles en input/ y permite al usuario seleccionar uno.
+
+    Returns:
+        str: Nombre del archivo seleccionado o None si no hay archivos o se cancela
+    """
+    archivos = glob(os.path.join('./input', '*.xlsx'))
+
+    if not archivos:
+        print("\n[ERROR] No hay archivos Excel (.xlsx) en la carpeta './input'")
+        print("Por favor, coloca los extractos bancarios en esa carpeta.")
+        return None
+
+    print("\n" + "=" * 80)
+    print("ARCHIVOS DISPONIBLES EN './input':")
+    print("=" * 80 + "\n")
+
+    for i, archivo in enumerate(archivos, 1):
+        nombre = os.path.basename(archivo)
+        tamaño = os.path.getsize(archivo) / 1024  # KB
+        print(f"  {i}. {nombre} ({tamaño:.1f} KB)")
+
+    print(f"\n  0. Cancelar")
+    print()
+
+    while True:
+        try:
+            opcion = input("Selecciona el número del archivo a procesar: ").strip()
+
+            if opcion == '0':
+                print("\nOperación cancelada.")
+                return None
+
+            idx = int(opcion) - 1
+            if 0 <= idx < len(archivos):
+                archivo_seleccionado = os.path.basename(archivos[idx])
+                print(f"\n[OK] Archivo seleccionado: {archivo_seleccionado}")
+                return archivo_seleccionado
+            else:
+                print(f"[ERROR] Opción inválida. Selecciona un número entre 1 y {len(archivos)}")
+
+        except ValueError:
+            print("[ERROR] Por favor ingresa un número válido.")
+        except KeyboardInterrupt:
+            print("\n\nOperación cancelada.")
+            return None
 
 
 def limpiar_pantalla():
@@ -74,12 +124,18 @@ def proceso_completo():
         print("\nProceso cancelado.")
         return
 
+    # Seleccionar archivo de input
+    archivo_input = seleccionar_archivo_input()
+    if archivo_input is None:
+        input("\nPresiona ENTER para continuar...")
+        return
+
     # PASO 1: Consolidar
     print("\n" + "=" * 80)
     print("PASO 1/3: CONSOLIDANDO EXTRACTOS BANCARIOS")
     print("=" * 80 + "\n")
 
-    resultado = consolidar_bancos()
+    resultado = consolidar_bancos(archivo_especifico=archivo_input)
     if resultado is None:
         print("\n[ERROR] Error en consolidacion. Proceso detenido.")
         input("\nPresiona ENTER para continuar...")
@@ -142,7 +198,13 @@ def solo_consolidar():
     print(">> BLOQUE 1: CONSOLIDAR EXTRACTOS BANCARIOS")
     print("=" * 80 + "\n")
 
-    consolidar_bancos()
+    # Seleccionar archivo de input
+    archivo_input = seleccionar_archivo_input()
+    if archivo_input is None:
+        input("\nPresiona ENTER para volver al menú principal...")
+        return
+
+    consolidar_bancos(archivo_especifico=archivo_input)
 
     input("\nPresiona ENTER para volver al menú principal...")
 
@@ -179,11 +241,14 @@ def configuracion():
     print(f"  - Carpeta de entrada:  ./input")
     print(f"  - Carpeta de salida:   ./output")
     print()
-    print("Nota: Para cambiar las rutas, usa los parámetros --input y --output")
+    print("Nota: El sistema ahora requiere seleccionar UN archivo específico para procesar.")
+    print("Esto previene errores al mezclar archivos de diferentes períodos/cuentas.")
+    print()
+    print("Para cambiar las rutas, usa los parámetros --input y --output")
     print("al ejecutar directamente main.py con argumentos.")
     print()
     print("Ejemplo:")
-    print("  python src/main.py --consolidar --input ./mis_extractos --output ./resultados")
+    print("  python src/main.py --consolidar --archivo MI_ARCHIVO.xlsx --input ./mis_extractos")
 
     input("\nPresiona ENTER para volver al menú principal...")
 

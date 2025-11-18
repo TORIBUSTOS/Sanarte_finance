@@ -75,26 +75,31 @@ def consolidar_bancos(ruta_input: str = "./input", ruta_output: str = "./output"
         print(f"Por favor, crea la carpeta y coloca allí los archivos Excel de los bancos.")
         return
 
-    # Buscar archivos Excel en la carpeta input
-    if archivo_especifico:
-        # Procesar solo el archivo específico
-        archivo_path = os.path.join(ruta_input, archivo_especifico)
-        if not os.path.exists(archivo_path):
-            print(f"\nError: No se encontró el archivo '{archivo_especifico}' en '{ruta_input}'")
-            print(f"\nArchivos disponibles:")
-            for f in glob(os.path.join(ruta_input, "*.xlsx")):
+    # Validar que se especifique un archivo
+    if not archivo_especifico:
+        print(f"\nError: Debes especificar un archivo con --archivo")
+        print(f"\nArchivos disponibles en '{ruta_input}':")
+        archivos_disponibles = glob(os.path.join(ruta_input, "*.xlsx"))
+        if archivos_disponibles:
+            for f in archivos_disponibles:
                 print(f"  - {os.path.basename(f)}")
-            return
-        archivos_excel = [archivo_path]
-        print(f"\nProcesando archivo específico: {archivo_especifico}")
-    else:
-        # Procesar todos los archivos
-        archivos_excel = glob(os.path.join(ruta_input, "*.xlsx"))
-
-    if not archivos_excel:
-        print(f"\nNo se encontraron archivos Excel (.xlsx) en '{ruta_input}'")
-        print(f"Por favor, coloca los extractos bancarios en esa carpeta.")
+            print(f"\nEjemplo de uso:")
+            print(f"  python src/main.py --consolidar --archivo {os.path.basename(archivos_disponibles[0])}")
+        else:
+            print(f"  (No se encontraron archivos .xlsx)")
         return
+
+    # Procesar el archivo específico
+    archivo_path = os.path.join(ruta_input, archivo_especifico)
+    if not os.path.exists(archivo_path):
+        print(f"\nError: No se encontró el archivo '{archivo_especifico}' en '{ruta_input}'")
+        print(f"\nArchivos disponibles:")
+        for f in glob(os.path.join(ruta_input, "*.xlsx")):
+            print(f"  - {os.path.basename(f)}")
+        return
+
+    archivos_excel = [archivo_path]
+    print(f"\nProcesando archivo: {archivo_especifico}")
 
     print(f"\nEncontrados {len(archivos_excel)} archivo(s) Excel:")
     for archivo in archivos_excel:
@@ -345,19 +350,21 @@ def main():
         epilog="""
 Ejemplos de uso:
 
-  Consolidar TODOS los extractos bancarios de input/:
-    python main.py --consolidar
-
-  Consolidar UN SOLO archivo específico:
+  Consolidar un extracto bancario (--archivo es OBLIGATORIO):
     python main.py --consolidar --archivo Movimientos_Supervielle_2025_11_18_.xlsx
 
-  Categorizar y generar reportes del archivo específico:
+  Flujo completo (consolidar, categorizar y generar reportes):
     python main.py --consolidar --archivo Movimientos_Supervielle_2025_11_18_.xlsx
     python main.py --categorizar --sin-revision
     python main.py --reportes --sin-abrir
 
   Especificar carpetas personalizadas:
-    python main.py --consolidar --input ./mis_extractos --output ./resultados
+    python main.py --consolidar --archivo MI_ARCHIVO.xlsx --input ./mis_extractos --output ./resultados
+
+IMPORTANTE:
+  - El argumento --archivo es OBLIGATORIO para --consolidar
+  - NO mezcles archivos de diferentes períodos/cuentas (rompe los saldos)
+  - Procesa UN archivo a la vez
 
 Para más información, consulta el README.md
         """
@@ -385,7 +392,7 @@ Para más información, consulta el README.md
         '--archivo',
         type=str,
         default=None,
-        help='Archivo específico a procesar en carpeta input/ (ej: Movimientos_Supervielle_2025_11_18_.xlsx). Si no se especifica, procesa todos los archivos (consolidar) o busca el más reciente (categorizar/reportes)'
+        help='[OBLIGATORIO con --consolidar] Archivo a procesar en carpeta input/ (ej: Movimientos_Supervielle_2025_11_18_.xlsx). Con --categorizar/--reportes busca el más reciente si no se especifica.'
     )
 
     parser.add_argument(

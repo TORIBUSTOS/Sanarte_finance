@@ -119,11 +119,6 @@ def proceso_completo():
     print("  3. Generar reportes y dashboard")
     print()
 
-    respuesta = input("¿Deseas continuar? (S/N): ").strip().upper()
-    if respuesta not in ['S', 'SI', 'Y', 'YES']:
-        print("\nProceso cancelado.")
-        return
-
     # Seleccionar archivo de input
     archivo_input = seleccionar_archivo_input()
     if archivo_input is None:

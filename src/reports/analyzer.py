@@ -29,17 +29,25 @@ class Analyzer:
         print("\nCalculando metricas financieras...")
 
         # Filtrar movimientos clasificados vs sin clasificar
-        df_clasificados = self.df[self.df['Categoria'] != 'Sin Clasificar']
-        df_sin_clasificar = self.df[self.df['Categoria'] == 'Sin Clasificar']
+        df_clasificados = self.df[self.df['Categoria_Principal'] != 'Sin Clasificar']
+        df_sin_clasificar = self.df[self.df['Categoria_Principal'] == 'Sin Clasificar']
 
         # Calcular saldos inicial y final
         saldo_inicial, saldo_final = self._calcular_saldos()
 
-        # Calcular totales
+        # Calcular totales (TODOS los movimientos)
         total_ingresos = self._calcular_ingresos()
         total_egresos = self._calcular_egresos()
         variacion = total_ingresos - total_egresos
         balance = total_ingresos - total_egresos  # Mantener por compatibilidad
+
+        # Calcular montos de movimientos sin clasificar
+        ingresos_sin_clasificar = df_sin_clasificar['Crédito'].sum()
+        egresos_sin_clasificar = df_sin_clasificar['Débito'].sum()
+
+        # Calcular montos solo de clasificados
+        ingresos_clasificados = df_clasificados[df_clasificados['Tipo_Movimiento'] == 'Ingreso']['Crédito'].sum()
+        egresos_clasificados = df_clasificados[df_clasificados['Tipo_Movimiento'] == 'Egreso']['Débito'].sum()
 
         # Validación de coherencia
         validacion_ok, diferencia = self._validar_coherencia_saldos(
@@ -72,6 +80,10 @@ class Analyzer:
             'total_egresos': total_egresos,
             'variacion': variacion,
             'balance': balance,  # Mantener por compatibilidad
+            'ingresos_clasificados': ingresos_clasificados,
+            'egresos_clasificados': egresos_clasificados,
+            'ingresos_sin_clasificar': ingresos_sin_clasificar,
+            'egresos_sin_clasificar': egresos_sin_clasificar,
             'total_movimientos': total_movimientos,
             'movimientos_clasificados': movimientos_clasificados,
             'movimientos_sin_clasificar': len(df_sin_clasificar),
@@ -94,7 +106,7 @@ class Analyzer:
         """
         Calcula el saldo inicial y final del período.
 
-        Saldo Inicial = saldo del movimiento más antiguo (primera fecha)
+        Saldo Inicial = saldo ANTES del primer movimiento
         Saldo Final = saldo del movimiento más reciente (última fecha)
 
         Returns:
@@ -103,14 +115,31 @@ class Analyzer:
         if len(self.df) == 0:
             return 0.0, 0.0
 
+        # Verificar si existe la columna Saldo y tiene valores
+        if 'Saldo' not in self.df.columns:
+            print("  ADVERTENCIA: El archivo no tiene columna 'Saldo'. No se puede calcular saldo inicial/final.")
+            return float('nan'), float('nan')
+
         # Ordenar por fecha
         df_ordenado = self.df.sort_values('Fecha')
 
-        # Saldo inicial: primer movimiento
-        saldo_inicial = df_ordenado.iloc[0]['Saldo']
-
-        # Saldo final: último movimiento
+        # Saldo final: último movimiento (DESPUÉS del último movimiento)
         saldo_final = df_ordenado.iloc[-1]['Saldo']
+
+        # Saldo inicial: ANTES del primer movimiento
+        # El saldo que aparece en el Excel es DESPUÉS del movimiento
+        # Entonces: Saldo_Antes = Saldo_Después - Crédito + Débito
+        primer_movimiento = df_ordenado.iloc[0]
+        saldo_despues_primer_mov = primer_movimiento['Saldo']
+        credito_primer_mov = primer_movimiento['Crédito'] if pd.notna(primer_movimiento['Crédito']) else 0
+        debito_primer_mov = primer_movimiento['Débito'] if pd.notna(primer_movimiento['Débito']) else 0
+
+        saldo_inicial = saldo_despues_primer_mov - credito_primer_mov + debito_primer_mov
+
+        # Verificar si son NaN
+        if pd.isna(saldo_inicial) or pd.isna(saldo_final):
+            print("  ADVERTENCIA: La columna 'Saldo' existe pero no tiene valores. No se puede calcular saldo inicial/final.")
+            return float('nan'), float('nan')
 
         return saldo_inicial, saldo_final
 
@@ -140,44 +169,44 @@ class Analyzer:
 
     def _calcular_ingresos(self) -> float:
         """
-        Calcula el total de ingresos.
+        Calcula el total de ingresos (TODOS los créditos).
 
         Returns:
             Total de ingresos
         """
-        df_ingresos = self.df[self.df['Categoria'] == 'Ingresos']
-        return df_ingresos['Crédito'].sum()
+        # Sumar TODOS los créditos (clasificados y sin clasificar)
+        return self.df['Crédito'].sum()
 
     def _calcular_egresos(self) -> float:
         """
-        Calcula el total de egresos.
+        Calcula el total de egresos (TODOS los débitos).
 
         Returns:
             Total de egresos
         """
-        df_egresos = self.df[self.df['Categoria'] == 'Egresos']
-        return df_egresos['Débito'].sum()
+        # Sumar TODOS los débitos (clasificados y sin clasificar)
+        return self.df['Débito'].sum()
 
     def _desglose_ingresos(self) -> Dict[str, float]:
         """
-        Desglose de ingresos por subcategoría.
+        Desglose de ingresos por categoría final.
 
         Returns:
-            Diccionario {subcategoria: monto}
+            Diccionario {categoria_final: monto}
         """
-        df_ingresos = self.df[self.df['Categoria'] == 'Ingresos']
-        desglose = df_ingresos.groupby('Subcategoria')['Crédito'].sum().to_dict()
+        df_ingresos = self.df[self.df['Tipo_Movimiento'] == 'Ingreso']
+        desglose = df_ingresos.groupby('Categoria_Final')['Crédito'].sum().to_dict()
         return desglose
 
     def _desglose_egresos(self) -> Dict[str, float]:
         """
-        Desglose de egresos por subcategoría.
+        Desglose de egresos por categoría final.
 
         Returns:
-            Diccionario {subcategoria: monto}
+            Diccionario {categoria_final: monto}
         """
-        df_egresos = self.df[self.df['Categoria'] == 'Egresos']
-        desglose = df_egresos.groupby('Subcategoria')['Débito'].sum().to_dict()
+        df_egresos = self.df[self.df['Tipo_Movimiento'] == 'Egreso']
+        desglose = df_egresos.groupby('Categoria_Final')['Débito'].sum().to_dict()
         return desglose
 
     def _top_prestadores(self, n: int = 10) -> List[Dict]:
@@ -190,7 +219,7 @@ class Analyzer:
         Returns:
             Lista de diccionarios con nombre y monto
         """
-        df_prestadores = self.df[self.df['Subcategoria'] == 'Prestadores']
+        df_prestadores = self.df[self.df['Categoria_Principal'] == 'Prestadores']
 
         if len(df_prestadores) == 0:
             return []
@@ -219,13 +248,13 @@ class Analyzer:
         self.df['Fecha_Solo'] = pd.to_datetime(self.df['Fecha']).dt.date
 
         # Filtrar solo clasificados
-        df_clasificados = self.df[self.df['Categoria'] != 'Sin Clasificar'].copy()
+        df_clasificados = self.df[self.df['Categoria_Principal'] != 'Sin Clasificar'].copy()
 
         # Calcular ingresos por fecha
-        ingresos_diarios = df_clasificados[df_clasificados['Categoria'] == 'Ingresos'].groupby('Fecha_Solo')['Crédito'].sum()
+        ingresos_diarios = df_clasificados[df_clasificados['Tipo_Movimiento'] == 'Ingreso'].groupby('Fecha_Solo')['Crédito'].sum()
 
         # Calcular egresos por fecha
-        egresos_diarios = df_clasificados[df_clasificados['Categoria'] == 'Egresos'].groupby('Fecha_Solo')['Débito'].sum()
+        egresos_diarios = df_clasificados[df_clasificados['Tipo_Movimiento'] == 'Egreso'].groupby('Fecha_Solo')['Débito'].sum()
 
         # Obtener todas las fechas únicas
         todas_fechas = sorted(df_clasificados['Fecha_Solo'].unique())
@@ -248,10 +277,29 @@ class Analyzer:
         """
         print("\nRESUMEN FINANCIERO:")
         print("="*80)
-        print(f"Saldo Inicial:   ${self.metricas['saldo_inicial']:,.2f}")
+
+        # Mostrar saldo inicial (puede ser NaN)
+        if pd.isna(self.metricas['saldo_inicial']):
+            print(f"Saldo Inicial:   No disponible (archivo sin columna Saldo)")
+        else:
+            print(f"Saldo Inicial:   ${self.metricas['saldo_inicial']:,.2f}")
+
         print(f"Total Ingresos:  ${self.metricas['total_ingresos']:,.2f}")
+        if self.metricas['ingresos_sin_clasificar'] > 0:
+            print(f"  - Clasificados:    ${self.metricas['ingresos_clasificados']:,.2f}")
+            print(f"  - Sin clasificar:  ${self.metricas['ingresos_sin_clasificar']:,.2f}")
+
         print(f"Total Egresos:   ${self.metricas['total_egresos']:,.2f}")
-        print(f"Saldo Final:     ${self.metricas['saldo_final']:,.2f}")
+        if self.metricas['egresos_sin_clasificar'] > 0:
+            print(f"  - Clasificados:    ${self.metricas['egresos_clasificados']:,.2f}")
+            print(f"  - Sin clasificar:  ${self.metricas['egresos_sin_clasificar']:,.2f}")
+
+        # Mostrar saldo final (puede ser NaN)
+        if pd.isna(self.metricas['saldo_final']):
+            print(f"Saldo Final:     No disponible (archivo sin columna Saldo)")
+        else:
+            print(f"Saldo Final:     ${self.metricas['saldo_final']:,.2f}")
+
         print(f"Variacion:       ${self.metricas['variacion']:,.2f}")
 
         # Validación de coherencia
@@ -298,4 +346,4 @@ class Analyzer:
         Returns:
             DataFrame con movimientos sin clasificar
         """
-        return self.df[self.df['Categoria'] == 'Sin Clasificar'].copy()
+        return self.df[self.df['Categoria_Principal'] == 'Sin Clasificar'].copy()

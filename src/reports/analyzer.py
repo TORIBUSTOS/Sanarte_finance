@@ -16,7 +16,15 @@ class Analyzer:
         Args:
             df: DataFrame con movimientos categorizados
         """
-        self.df = df.copy()
+        # Filtrar movimientos inválidos (sin fecha o con fecha NaT)
+        df_limpio = df[df['Fecha'].notna()].copy()
+
+        # Advertir si se filtraron movimientos
+        if len(df_limpio) < len(df):
+            filas_filtradas = len(df) - len(df_limpio)
+            print(f"  Advertencia: Se filtraron {filas_filtradas} movimiento(s) sin fecha válida")
+
+        self.df = df_limpio
         self.metricas = {}
 
     def calcular_metricas(self) -> Dict:

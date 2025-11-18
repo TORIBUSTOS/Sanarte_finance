@@ -55,13 +55,14 @@ def detectar_banco(ruta_archivo: str):
         return None, None
 
 
-def consolidar_bancos(ruta_input: str = "./input", ruta_output: str = "./output"):
+def consolidar_bancos(ruta_input: str = "./input", ruta_output: str = "./output", archivo_especifico: str = None):
     """
     Proceso completo de consolidación de extractos bancarios.
 
     Args:
         ruta_input: Carpeta donde están los archivos Excel
         ruta_output: Carpeta donde se guardarán los resultados
+        archivo_especifico: Nombre de archivo específico a procesar (opcional)
     """
     print("="*80)
     print("SANARTE - Sistema de Control Financiero")
@@ -75,7 +76,20 @@ def consolidar_bancos(ruta_input: str = "./input", ruta_output: str = "./output"
         return
 
     # Buscar archivos Excel en la carpeta input
-    archivos_excel = glob(os.path.join(ruta_input, "*.xlsx"))
+    if archivo_especifico:
+        # Procesar solo el archivo específico
+        archivo_path = os.path.join(ruta_input, archivo_especifico)
+        if not os.path.exists(archivo_path):
+            print(f"\nError: No se encontró el archivo '{archivo_especifico}' en '{ruta_input}'")
+            print(f"\nArchivos disponibles:")
+            for f in glob(os.path.join(ruta_input, "*.xlsx")):
+                print(f"  - {os.path.basename(f)}")
+            return
+        archivos_excel = [archivo_path]
+        print(f"\nProcesando archivo específico: {archivo_especifico}")
+    else:
+        # Procesar todos los archivos
+        archivos_excel = glob(os.path.join(ruta_input, "*.xlsx"))
 
     if not archivos_excel:
         print(f"\nNo se encontraron archivos Excel (.xlsx) en '{ruta_input}'")
@@ -331,8 +345,16 @@ def main():
         epilog="""
 Ejemplos de uso:
 
-  Consolidar extractos bancarios:
+  Consolidar TODOS los extractos bancarios de input/:
     python main.py --consolidar
+
+  Consolidar UN SOLO archivo específico:
+    python main.py --consolidar --archivo Movimientos_Supervielle_2025_11_18_.xlsx
+
+  Categorizar y generar reportes del archivo específico:
+    python main.py --consolidar --archivo Movimientos_Supervielle_2025_11_18_.xlsx
+    python main.py --categorizar --sin-revision
+    python main.py --reportes --sin-abrir
 
   Especificar carpetas personalizadas:
     python main.py --consolidar --input ./mis_extractos --output ./resultados
@@ -363,7 +385,7 @@ Para más información, consulta el README.md
         '--archivo',
         type=str,
         default=None,
-        help='Archivo a procesar (default: el más reciente)'
+        help='Archivo específico a procesar en carpeta input/ (ej: Movimientos_Supervielle_2025_11_18_.xlsx). Si no se especifica, procesa todos los archivos (consolidar) o busca el más reciente (categorizar/reportes)'
     )
 
     parser.add_argument(
@@ -401,7 +423,7 @@ Para más información, consulta el README.md
 
     # Ejecutar consolidación
     if args.consolidar:
-        consolidar_bancos(ruta_input=args.input, ruta_output=args.output)
+        consolidar_bancos(ruta_input=args.input, ruta_output=args.output, archivo_especifico=args.archivo)
 
     # Ejecutar categorización
     if args.categorizar:

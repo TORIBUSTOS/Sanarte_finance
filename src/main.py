@@ -292,7 +292,7 @@ def generar_reportes(ruta_archivo_categorizado: str = None,
     nombre_dashboard = f"dashboard_{fecha_actual.year}_{fecha_actual.month:02d}.html"
     ruta_dashboard = os.path.join(ruta_output, nombre_dashboard)
 
-    dashboard_gen = DashboardGenerator(metricas, df_sin_clasificar)
+    dashboard_gen = DashboardGenerator(df, metricas)
     dashboard_gen.generar_html(ruta_dashboard)
 
     # Generar reporte ejecutivo Excel

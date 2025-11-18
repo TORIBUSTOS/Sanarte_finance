@@ -31,3 +31,8 @@ Thumbs.db
 *.env
 .env.local
 credentials.json
+
+# Archivos generados
+output/*.xlsx
+output/*.html
+output/*.pdf

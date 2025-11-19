@@ -1,8 +1,8 @@
 """
-SANARTE - Sistema de Control Financiero
+TORO - Sistema de Resumen de Cuenta
 Menú Principal CLI Interactivo - Bloque 4
 
-Autor: Sistema SANARTE
+Autor: Sistema TORO
 Versión: 1.3 - Bloque 4: Orquestador Completo
 """
 import os
@@ -96,8 +96,8 @@ def mostrar_banner():
     fecha_hora = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
 
     banner_text = Text()
-    banner_text.append("🏦 SANARTE ", style="bold cyan")
-    banner_text.append("- CONTROL FINANCIERO\n", style="bold white")
+    banner_text.append("🏦 TORO ", style="bold cyan")
+    banner_text.append("- Resumen de Cuenta\n", style="bold white")
     banner_text.append("💰 Sistema Integrado v1.3\n", style="bold green")
     banner_text.append(f"📅 {fecha_hora}", style="dim")
 
@@ -310,11 +310,11 @@ def informacion_sistema():
 
     # Info básica
     info_texto = Text()
-    info_texto.append("SANARTE - Sistema de Control Financiero\n", style="bold white")
+    info_texto.append("TORO - Sistema de Resumen de Cuenta\n", style="bold white")
     info_texto.append("Versión: ", style="dim")
     info_texto.append("1.3\n", style="bold green")
     info_texto.append("Autor: ", style="dim")
-    info_texto.append("Sistema SANARTE\n", style="cyan")
+    info_texto.append("Sistema TORO\n", style="cyan")
     info_texto.append("Fecha: ", style="dim")
     info_texto.append("Noviembre 2025", style="white")
 
@@ -372,7 +372,7 @@ def main():
             if opcion == '0':
                 console.print()
                 console.print(Panel(
-                    "[bold white]¡Gracias por usar SANARTE Control Financiero![/bold white]\n"
+                    "[bold white]¡Gracias por usar TORO - Resumen de Cuenta![/bold white]\n"
                     "[dim]Sistema v1.3 - Noviembre 2025[/dim]",
                     title="[bold green]👋 HASTA PRONTO[/bold green]",
                     border_style="green",
@@ -406,7 +406,7 @@ def main():
         except KeyboardInterrupt:
             console.print()
             console.print(Panel(
-                "[bold white]¡Gracias por usar SANARTE Control Financiero![/bold white]\n"
+                "[bold white]¡Gracias por usar TORO - Resumen de Cuenta![/bold white]\n"
                 "[dim]Sistema v1.3 - Noviembre 2025[/dim]",
                 title="[bold yellow]👋 HASTA PRONTO[/bold yellow]",
                 border_style="yellow",

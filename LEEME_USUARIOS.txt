@@ -1,0 +1,114 @@
+================================================================================
+                    SANARTE - CONTROL FINANCIERO v1.3
+================================================================================
+
+INSTALACIÓN:
+
+  1. Extraer este archivo ZIP a una carpeta de tu elección
+     (Ejemplo: C:\Programas\SANARTE)
+
+  2. ¡Listo! No requiere instalación adicional
+
+
+CÓMO USAR:
+
+  1. Copiar tu extracto bancario (.xlsx) a la carpeta "input"
+
+  2. Hacer doble clic en SANARTE.exe
+
+  3. En el menú, elegir opción 1
+
+  4. Seleccionar el número de tu archivo
+
+  5. Esperar 1-5 minutos (dependiendo del tamaño)
+
+  6. Revisar los reportes generados en carpeta "output":
+     - dashboard_2025_XX.html → Abrir en navegador
+     - reporte_ejecutivo_2025_XX.xlsx → Abrir en Excel
+
+
+ESTRUCTURA DE CARPETAS:
+
+  SANARTE_v1.3/
+  ├── SANARTE.exe          ← Programa principal
+  ├── input/               ← Coloca aquí tus extractos bancarios
+  ├── output/              ← Aquí se guardan los reportes
+  └── LEEME.txt           ← Este archivo
+
+
+REPORTES GENERADOS:
+
+  1. dashboard_2025_XX.html
+     - Dashboard interactivo con gráficos
+     - Resumen ejecutivo
+     - Top 10 egresos y prestadores
+
+  2. reporte_ejecutivo_2025_XX.xlsx
+     - Reporte Excel completo
+     - 5 hojas: Resumen, Ingresos, Egresos, Top, Sin Clasificar
+
+  3. movimientos_categorizados_2025_XX.xlsx
+     - Todos los movimientos clasificados
+     - Columnas: Tipo, Categoría, Subcategoría, etc.
+
+  4. movimientos_consolidados_2025_XX.xlsx
+     - Movimientos normalizados del banco
+
+
+BANCOS SOPORTADOS:
+
+  ✓ Banco Supervielle
+  ✓ Banco Galicia
+
+
+CLASIFICACIÓN AUTOMÁTICA:
+
+  El sistema clasifica automáticamente ~99% de los movimientos en:
+
+  - Impuestos (AFIP, IVA, Percepciones, etc.)
+  - Ingresos (Transferencias, DEBIN, Cheques, Obras Sociales)
+  - Gastos Operativos (Sueldos, Compras, Viáticos)
+  - Prestadores (Profesionales, Farmacias)
+  - Comisiones Bancarias
+  - Servicios (Luz, Gas, Agua, Internet)
+
+
+REQUISITOS:
+
+  - Windows 10 o superior
+  - No requiere Python instalado
+  - No requiere instalación de programas adicionales
+
+
+SOLUCIÓN DE PROBLEMAS:
+
+  "Windows protegió tu PC"
+  ────────────────────────────────────────────────────
+  1. Clic en "Más información"
+  2. Clic en "Ejecutar de todas formas"
+
+  "El archivo está siendo usado por otro proceso"
+  ────────────────────────────────────────────────────
+  Cerrar Excel antes de regenerar reportes
+
+  "No se encontraron archivos en input/"
+  ────────────────────────────────────────────────────
+  Verificar que el archivo sea .xlsx (no .xls)
+
+
+CONTACTO Y SOPORTE:
+
+  Para reportar problemas o solicitar ayuda:
+  - Email: [completar]
+  - GitHub: https://github.com/TORIBUSTOS/Sanarte_finance
+
+
+VERSIÓN:
+
+  SANARTE v1.3 - Noviembre 2025
+  Sistema de Control Financiero
+
+
+================================================================================
+                        ¡Gracias por usar SANARTE!
+================================================================================

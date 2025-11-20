@@ -95,36 +95,40 @@ def mostrar_banner():
     """Muestra el banner principal del sistema."""
     fecha_hora = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
 
-    # ASCII art del toro (versión compacta)
-    toro_art = """
-                          .:*%*-.
-                         .*@+.      .::.
-                         *@%.        .#*.
-                         #@@+.        .%#.
-                         =@@@%=:....   :%@:
-                         .=%@@@@@%%%##%%@@%.
-                           .*%@@@@@@@@@@@@@@%%##:
-                        ..*@@@@@@@@@@@@@@@@@@@@@#+.
-                      .-#@@@@@@@@@@@@@@@@@@@@@@@@+.
-             ..         .-%@@@@@@@@@@@@@@@@%%#%%@@%.
-             .:.       .+@@@@@@@@@@@@@@@%+:.    ..
-              +-.     .-%@@@@@@@@@@@@@@:-%@*..
-              .*=.    .*@@@@@@@@@@@@@@=*@@@@@@%*:.
-               .+@-. .@@@@@@@@@@@@@@@@@@@@@@@@@%#+=:
-                 :##-.%@@@@@@@@@@@@@@@@@@@@@@@@%%*+
-                  .=%%@@@@@@@@@@@@@@@@@@@@@@@@@%%#
-                    .=%@@@@@@@@@@@@@@@@@@@@@@@@@%
-                      .-*%@@@@@@@@@@@@@@@@@@@@%*:.
-                          .:=*%%%%%%%%%%*=.
-"""
-
     banner_text = Text()
-    banner_text.append(toro_art, style="bold cyan")
-    banner_text.append("\n")
-    banner_text.append("                    🏦 TORO ", style="bold cyan")
+
+    # Logo del toro con texto a la derecha
+    banner_text.append("       .:*%*-.\n", style="bold cyan")
+    banner_text.append("      .*@+.      .::.\n", style="bold cyan")
+    banner_text.append("      *@%.        .#*.\n", style="bold cyan")
+    banner_text.append("      #@@+.        .%#.\n", style="bold cyan")
+    banner_text.append("      =@@@%=:....   :%@:\n", style="bold cyan")
+    banner_text.append("      .=%@@@@@%%%##%%@@%.\n", style="bold cyan")
+    banner_text.append("        .*%@@@@@@@@@@@@@@%%##:\n", style="bold cyan")
+    banner_text.append("     ..*@@@@@@@@@@@@@@@@@@@@@#+.\n", style="bold cyan")
+
+    # Línea con título
+    banner_text.append("   .-#@@@@@@@@@@@@@@@@@@@@@@@@+.      ", style="bold cyan")
+    banner_text.append("🏦 TORO ", style="bold cyan")
     banner_text.append("- Resumen de Cuenta\n", style="bold white")
-    banner_text.append("                    👨‍💻 TORO DevTeam · Tori / Rosario\n", style="bold yellow")
-    banner_text.append(f"                    📅 {fecha_hora}", style="dim")
+
+    # Línea con subtítulo
+    banner_text.append("  .-%@@@@@@@@@@@@@@@@%%#%%@@%.       ", style="bold cyan")
+    banner_text.append("👨‍💻 TORO DevTeam · Tori / Rosario\n", style="bold yellow")
+
+    # Línea con fecha
+    banner_text.append(" .+@@@@@@@@@@@@@@@%+:.    ..        ", style="bold cyan")
+    banner_text.append(f"📅 {fecha_hora}\n", style="dim")
+
+    # Resto del logo
+    banner_text.append(".-%@@@@@@@@@@@@@@:-%@*..\n", style="bold cyan")
+    banner_text.append(".*@@@@@@@@@@@@@@=*@@@@@@%*:.\n", style="bold cyan")
+    banner_text.append(" .@@@@@@@@@@@@@@@@@@@@@@@@@%#+=:\n", style="bold cyan")
+    banner_text.append("  .%@@@@@@@@@@@@@@@@@@@@@@@@%%*+\n", style="bold cyan")
+    banner_text.append("   .=%%@@@@@@@@@@@@@@@@@@@@@@@%%#\n", style="bold cyan")
+    banner_text.append("     .=%@@@@@@@@@@@@@@@@@@@@@@@%\n", style="bold cyan")
+    banner_text.append("       .-*%@@@@@@@@@@@@@@@@@@%*:.\n", style="bold cyan")
+    banner_text.append("           .:=*%%%%%%%%%%*=.", style="bold cyan")
 
     panel = Panel(
         banner_text,

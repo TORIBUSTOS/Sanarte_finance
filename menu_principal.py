@@ -95,11 +95,46 @@ def mostrar_banner():
     """Muestra el banner principal del sistema."""
     fecha_hora = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
 
+    # ASCII art del toro
+    toro_art = """
+                                                         .:.
+                                                        :=:.
+                                                         .:+-.
+                                                           .-#:
+                             .:*%*-.                             :#=.
+                            .*@+.                 .::.            .%#.
+                            *@%.                   ..#*.           .##.
+                            #@@+.                    .%#.           :%#.
+                            =@@@%=:....              :%@:           .+@*.
+                            .=%@@@@@%%%#%%%%##=:. ..*@@%.            -%%-
+                              .*%@@@@@@@@@@@%%%%@%+:.-#-.            .#@*.
+                                .:+#@@@@@@@@%*-=#@@@@#=:.             *@#:.
+                                 .+%@@@@@@@@@@@@@@@@@@@@%%####:       +@%-
+                              ..*@@@@@@@@@@@@@@@@@@@@@@@@@@@@#+.      *@@-.
+                            .-#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@+.     .#@%-
+                               ..:#@@@@@@@@@@@@@@@@@@@@@@@@@@#:      :%@%:
+                  ..           .-%@@@@@@@@@@@@@@@@@@%%%#%%@@%.      .+@@#.
+                  .:.         .+@@@@@@@@@@@@@@@@%+:.      ..        :%@@+.
+                   --        .=@@@@@@@@@@@@@@@%+.:+*:.              *@@%:
+                    +-.     .-%@@@@@@@@@@@@@@@:-%@*..             .#@@@-
+                    .*=.    .*@@@@@@@@@@@@@@@=*@@@@@%*:.         :#@@@=
+                     .+*.   .%@@@@@@@@@@@@@@%#@@@@@@@@@#-::::::.-#%%%
+                      .+@-. .@@@@@@@@@@@@@@@@@@@@@@@@@@%#+---==*+###+
+                        :##-.%@@@@@@@@@@@@@@@@@@@@@@@@@%%++**++++**
+                         .=%%@@@@@@@@@@@@@@@@@@@@@@@@@@%%**+++=**-:
+                           .=%@@@@@@@@@@@@@@@@@@@@@@@@@@%%##%%#+--
+                             .-*%@@@@@@@@@@@@@@@@@@@@@@@@@@%*:.
+                                .:=%@@@@@@@@@@@@@@@@@@@@#=:.
+                                     .:=*%%%%%%%%%%*=.
+"""
+
     banner_text = Text()
-    banner_text.append("🏦 TORO ", style="bold cyan")
+    banner_text.append(toro_art, style="bold cyan")
+    banner_text.append("\n")
+    banner_text.append("                    🏦 TORO ", style="bold cyan")
     banner_text.append("- Resumen de Cuenta\n", style="bold white")
-    banner_text.append("💰 Sistema Integrado v1.3\n", style="bold green")
-    banner_text.append(f"📅 {fecha_hora}", style="dim")
+    banner_text.append("                    💰 Sistema Integrado v1.3\n", style="bold green")
+    banner_text.append(f"                    📅 {fecha_hora}", style="dim")
 
     panel = Panel(
         banner_text,

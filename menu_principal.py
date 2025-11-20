@@ -123,7 +123,7 @@ def mostrar_banner():
     banner_text.append("\n")
     banner_text.append("                    🏦 TORO ", style="bold cyan")
     banner_text.append("- Resumen de Cuenta\n", style="bold white")
-    banner_text.append("                    💰 Sistema Integrado v1.3\n", style="bold green")
+    banner_text.append("                    👨‍💻 TORO DevTeam · Tori / Rosario\n", style="bold yellow")
     banner_text.append(f"                    📅 {fecha_hora}", style="dim")
 
     panel = Panel(

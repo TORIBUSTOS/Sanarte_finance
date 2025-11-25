@@ -1,0 +1,317 @@
+/* ===================================
+   SANARTE Dashboard - Estilos
+   =================================== */
+
+/* Reset y Base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 20px;
+    min-height: 100vh;
+}
+
+/* Container Principal */
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    overflow: hidden;
+}
+
+/* Header */
+.header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 30px;
+    text-align: center;
+}
+
+.header h1 {
+    font-size: 2.5em;
+    margin-bottom: 10px;
+}
+
+.header p {
+    font-size: 1.1em;
+    opacity: 0.9;
+}
+
+/* Main Content */
+.content {
+    padding: 30px;
+}
+
+/* Secciones */
+.alerts-section,
+.kpi-section,
+.detail-kpi-section,
+.charts-section,
+.tables-section {
+    margin-bottom: 30px;
+}
+
+.kpi-section h2,
+.detail-kpi-section h2,
+.charts-section h2,
+.tables-section h2 {
+    margin-bottom: 10px;
+    font-size: 1.4rem;
+    color: #333;
+}
+
+.kpi-section p,
+.detail-kpi-section p {
+    margin-bottom: 20px;
+    color: #555;
+    font-size: 0.95rem;
+}
+
+/* Alertas */
+.alert {
+    background-color: #fff3cd;
+    border: 1px solid #ffc107;
+    border-radius: 5px;
+    padding: 15px;
+    margin-bottom: 20px;
+    color: #856404;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    border-color: #dc3545;
+    color: #721c24;
+}
+
+.alert-info {
+    background-color: #d1ecf1;
+    border-color: #17a2b8;
+    color: #0c5460;
+}
+
+/* Tarjetas (Cards) */
+.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.cards.kpi-cards {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.cards.detail-cards {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.card {
+    background: white;
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    border-left: 4px solid;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+/* Colores de borde por tipo de card */
+.card.ingresos {
+    border-color: #28a745;
+}
+
+.card.egresos {
+    border-color: #dc3545;
+}
+
+.card.variacion {
+    border-color: #dc3545;
+}
+
+.card.clasificados {
+    border-color: #007bff;
+}
+
+.card.saldo-inicial {
+    border-color: #6f42c1;
+}
+
+.card.saldo-final {
+    border-color: #17a2b8;
+}
+
+.card.debin {
+    border-color: #20c997;
+}
+
+.card.prestadores {
+    border-color: #fd7e14;
+}
+
+.card.mayor-ingreso {
+    border-color: #28a745;
+}
+
+.card.mayor-egreso {
+    border-color: #e83e8c;
+}
+
+/* Contenido de las cards */
+.card-title {
+    font-size: 0.9em;
+    color: #666;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.card-value {
+    font-size: 2em;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.card-subtitle {
+    font-size: 0.85em;
+    color: #999;
+}
+
+/* Colores de valores por tipo */
+.card.ingresos .card-value,
+.card.mayor-ingreso .card-value,
+.card.debin .card-value {
+    color: #28a745;
+}
+
+.card.egresos .card-value,
+.card.variacion .card-value {
+    color: #dc3545;
+}
+
+.card.mayor-egreso .card-value {
+    color: #e83e8c;
+}
+
+.card.clasificados .card-value {
+    color: #007bff;
+}
+
+.card.saldo-inicial .card-value {
+    color: #6f42c1;
+}
+
+.card.saldo-final .card-value {
+    color: #17a2b8;
+}
+
+.card.prestadores .card-value {
+    color: #fd7e14;
+}
+
+/* Gráficos */
+.charts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+.chart-container {
+    background: white;
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.chart-title {
+    font-size: 1.3em;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.chart-full {
+    grid-column: 1 / -1;
+}
+
+/* Tablas */
+.summary-table {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    color: #333;
+}
+
+tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* Footer */
+.footer {
+    background: #f8f9fa;
+    padding: 20px;
+    text-align: center;
+    color: #666;
+    font-size: 0.9em;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .charts {
+        grid-template-columns: 1fr;
+    }
+
+    .cards,
+    .cards.kpi-cards,
+    .cards.detail-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .header h1 {
+        font-size: 1.8em;
+    }
+
+    .card-value {
+        font-size: 1.6em;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 10px;
+    }
+
+    .content {
+        padding: 15px;
+    }
+
+    .header {
+        padding: 20px;
+    }
+}

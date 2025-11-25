@@ -1,13 +1,12 @@
 """
-SANARTE - Sistema de Control Financiero
+TORO - Sistema de Resumen de Cuenta
 Menú Principal CLI Interactivo - Bloque 4
 
-Autor: Sistema SANARTE
+Autor: Sistema TORO
 Versión: 1.3 - Bloque 4: Orquestador Completo
 """
 import os
 import sys
-from glob import glob
 from datetime import datetime
 
 # Agregar el directorio src al path para imports
@@ -17,13 +16,74 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 from main import consolidar_bancos, categorizar_movimientos, generar_reportes
+from glob import glob
 
-# Variable global para mantener el contexto de la sesión de trabajo
-sesion_trabajo = {
-    'archivo_consolidado': None,
-    'archivo_categorizado': None,
-    'archivos_input_usados': []
-}
+# Rich imports para interfaz mejorada
+from rich.console import Console
+from rich.table import Table
+from rich.panel import Panel
+from rich.text import Text
+from rich import box
+from rich.prompt import Prompt, Confirm
+
+console = Console()
+
+
+def seleccionar_archivo_input():
+    """
+    Muestra archivos disponibles en input/ y permite al usuario seleccionar uno.
+
+    Returns:
+        str: Nombre del archivo seleccionado o None si no hay archivos o se cancela
+    """
+    archivos = glob(os.path.join('./input', '*.xlsx'))
+
+    if not archivos:
+        console.print("\n[bold red]❌ ERROR:[/bold red] No hay archivos Excel (.xlsx) en la carpeta './input'")
+        console.print("[yellow]Por favor, coloca los extractos bancarios en esa carpeta.[/yellow]")
+        return None
+
+    # Crear tabla con rich
+    tabla = Table(title="📁 Archivos Disponibles", box=box.ROUNDED, title_style="bold cyan")
+    tabla.add_column("#", style="cyan", justify="center", width=5)
+    tabla.add_column("Nombre del Archivo", style="white")
+    tabla.add_column("Tamaño", justify="right", style="green")
+
+    for i, archivo in enumerate(archivos, 1):
+        nombre = os.path.basename(archivo)
+        tamaño = os.path.getsize(archivo) / 1024  # KB
+        tabla.add_row(str(i), nombre, f"{tamaño:.1f} KB")
+
+    tabla.add_row("0", "[italic]Cancelar[/italic]", "", style="dim")
+
+    console.print()
+    console.print(tabla)
+    console.print()
+
+    while True:
+        try:
+            opcion = Prompt.ask(
+                "[bold cyan]Selecciona el número del archivo[/bold cyan]",
+                default="1"
+            ).strip()
+
+            if opcion == '0':
+                console.print("[yellow]Operación cancelada.[/yellow]")
+                return None
+
+            idx = int(opcion) - 1
+            if 0 <= idx < len(archivos):
+                archivo_seleccionado = os.path.basename(archivos[idx])
+                console.print(f"\n[bold green]✅ Archivo seleccionado:[/bold green] {archivo_seleccionado}")
+                return archivo_seleccionado
+            else:
+                console.print(f"[bold red]❌ Opción inválida.[/bold red] Selecciona un número entre 1 y {len(archivos)}")
+
+        except ValueError:
+            console.print("[bold red]❌ Por favor ingresa un número válido.[/bold red]")
+        except KeyboardInterrupt:
+            console.print("\n[yellow]Operación cancelada.[/yellow]")
+            return None
 
 
 def limpiar_pantalla():
@@ -33,88 +93,129 @@ def limpiar_pantalla():
 
 def mostrar_banner():
     """Muestra el banner principal del sistema."""
-    print("\n" + "=" * 80)
-    print("#" * 80)
-    print("#" + " " * 78 + "#")
-    print("#" + " " * 20 + "SANARTE - CONTROL FINANCIERO" + " " * 30 + "#")
-    print("#" + " " * 25 + "Sistema Integrado v1.3" + " " * 32 + "#")
-    print("#" + " " * 78 + "#")
-    print("#" * 80)
-    print("=" * 80)
     fecha_hora = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-    print(f"Fecha y hora: {fecha_hora}")
-    print("=" * 80)
 
-    # Mostrar estado de la sesión de trabajo
-    if sesion_trabajo['archivo_consolidado'] or sesion_trabajo['archivo_categorizado']:
-        print("\n[SESION ACTIVA]")
-        if sesion_trabajo['archivos_input_usados']:
-            print(f"  Archivos input: {', '.join(sesion_trabajo['archivos_input_usados'])}")
-        if sesion_trabajo['archivo_consolidado']:
-            print(f"  Consolidado: {os.path.basename(sesion_trabajo['archivo_consolidado'])}")
-        if sesion_trabajo['archivo_categorizado']:
-            print(f"  Categorizado: {os.path.basename(sesion_trabajo['archivo_categorizado'])}")
-        print("=" * 80)
-    print()
+    banner_text = Text()
+
+    # Logo del toro con texto a la derecha
+    banner_text.append("       .:*%*-.\n", style="bold cyan")
+    banner_text.append("      .*@+.      .::.\n", style="bold cyan")
+    banner_text.append("      *@%.        .#*.\n", style="bold cyan")
+    banner_text.append("      #@@+.        .%#.\n", style="bold cyan")
+    banner_text.append("      =@@@%=:....   :%@:\n", style="bold cyan")
+    banner_text.append("      .=%@@@@@%%%##%%@@%.\n", style="bold cyan")
+    banner_text.append("        .*%@@@@@@@@@@@@@@%%##:\n", style="bold cyan")
+    banner_text.append("     ..*@@@@@@@@@@@@@@@@@@@@@#+.\n", style="bold cyan")
+
+    # Línea con título
+    banner_text.append("   .-#@@@@@@@@@@@@@@@@@@@@@@@@+.      ", style="bold cyan")
+    banner_text.append("🏦 TORO ", style="bold cyan")
+    banner_text.append("- Resumen de Cuenta\n", style="bold white")
+
+    # Línea con subtítulo
+    banner_text.append("  .-%@@@@@@@@@@@@@@@@%%#%%@@%.       ", style="bold cyan")
+    banner_text.append("👨‍💻 TORO DevTeam · Tori / Rosario\n", style="bold yellow")
+
+    # Línea con fecha
+    banner_text.append(" .+@@@@@@@@@@@@@@@%+:.    ..        ", style="bold cyan")
+    banner_text.append(f"📅 {fecha_hora}\n", style="dim")
+
+    # Resto del logo
+    banner_text.append(".-%@@@@@@@@@@@@@@:-%@*..\n", style="bold cyan")
+    banner_text.append(".*@@@@@@@@@@@@@@=*@@@@@@%*:.\n", style="bold cyan")
+    banner_text.append(" .@@@@@@@@@@@@@@@@@@@@@@@@@%#+=:\n", style="bold cyan")
+    banner_text.append("  .%@@@@@@@@@@@@@@@@@@@@@@@@%%*+\n", style="bold cyan")
+    banner_text.append("   .=%%@@@@@@@@@@@@@@@@@@@@@@@%%#\n", style="bold cyan")
+    banner_text.append("     .=%@@@@@@@@@@@@@@@@@@@@@@@%\n", style="bold cyan")
+    banner_text.append("       .-*%@@@@@@@@@@@@@@@@@@%*:.\n", style="bold cyan")
+    banner_text.append("           .:=*%%%%%%%%%%*=.", style="bold cyan")
+
+    panel = Panel(
+        banner_text,
+        box=box.DOUBLE,
+        border_style="cyan",
+        padding=(1, 2)
+    )
+
+    console.print()
+    console.print(panel)
 
 
 def mostrar_menu_principal():
     """Muestra el menú principal."""
-    print("\n+-------------------------------------------------------------+")
-    print("|                     MENU PRINCIPAL                          |")
-    print("+-------------------------------------------------------------+")
-    print("|                                                             |")
-    print("|  1. PROCESO COMPLETO (Consolidar -> Categorizar -> Reportes)|")
-    print("|                                                             |")
-    print("|  2. CONSOLIDAR extractos bancarios (todos los archivos)     |")
-    print("|  3. CONSOLIDAR con SELECCIÓN de archivos específicos        |")
-    print("|  4. CATEGORIZAR movimientos                                 |")
-    print("|  5. Generar REPORTES y Dashboard                            |")
-    print("|                                                             |")
-    print("|  6. Configuracion de rutas                                  |")
-    print("|  7. Informacion del sistema                                 |")
-    print("|  8. Limpiar SESION de trabajo                               |")
-    print("|                                                             |")
-    print("|  0. SALIR                                                   |")
-    print("|                                                             |")
-    print("+-------------------------------------------------------------+\n")
+    menu = Table(show_header=False, box=box.ROUNDED, border_style="cyan", padding=(0, 2))
+    menu.add_column("Opción", style="bold cyan", width=8)
+    menu.add_column("Descripción", style="white")
+
+    menu.add_row("1", "🔄 PROCESO COMPLETO (Consolidar → Categorizar → Reportes)")
+    menu.add_row("", "")
+    menu.add_row("2", "📥 Solo CONSOLIDAR extractos bancarios")
+    menu.add_row("3", "🏷️  Solo CATEGORIZAR movimientos")
+    menu.add_row("4", "📊 Solo generar REPORTES y Dashboard")
+    menu.add_row("", "")
+    menu.add_row("5", "⚙️  Configuración de rutas")
+    menu.add_row("6", "ℹ️  Información del sistema")
+    menu.add_row("", "")
+    menu.add_row("0", "🚪 SALIR", style="dim")
+
+    panel = Panel(
+        menu,
+        title="[bold white]MENÚ PRINCIPAL[/bold white]",
+        border_style="cyan",
+        box=box.DOUBLE
+    )
+
+    console.print()
+    console.print(panel)
+    console.print()
 
 
 def proceso_completo():
     """Ejecuta el proceso completo: consolidar -> categorizar -> reportes."""
-    print("\n" + "=" * 80)
-    print(">> INICIANDO PROCESO COMPLETO")
-    print("=" * 80)
-    print("\nEste proceso ejecutará los 3 bloques en secuencia:")
-    print("  1. Consolidar extractos bancarios")
-    print("  2. Categorizar movimientos")
-    print("  3. Generar reportes y dashboard")
-    print()
+    console.print()
+    console.print(Panel(
+        "[bold white]Este proceso ejecutará los 3 bloques en secuencia:[/bold white]\n\n"
+        "  [cyan]1.[/cyan] Consolidar extractos bancarios\n"
+        "  [cyan]2.[/cyan] Categorizar movimientos\n"
+        "  [cyan]3.[/cyan] Generar reportes y dashboard",
+        title="[bold green]🔄 INICIANDO PROCESO COMPLETO[/bold green]",
+        border_style="green",
+        box=box.ROUNDED
+    ))
+    console.print()
 
-    respuesta = input("¿Deseas continuar? (S/N): ").strip().upper()
-    if respuesta not in ['S', 'SI', 'Y', 'YES']:
-        print("\nProceso cancelado.")
+    # Seleccionar archivo de input
+    archivo_input = seleccionar_archivo_input()
+    if archivo_input is None:
+        Prompt.ask("\n[dim]Presiona ENTER para continuar[/dim]")
         return
 
     # PASO 1: Consolidar
-    print("\n" + "=" * 80)
-    print("PASO 1/3: CONSOLIDANDO EXTRACTOS BANCARIOS")
-    print("=" * 80 + "\n")
+    console.print()
+    console.print(Panel(
+        "[bold cyan]PASO 1/3: CONSOLIDANDO EXTRACTOS BANCARIOS[/bold cyan]",
+        border_style="cyan",
+        box=box.HEAVY
+    ))
 
-    resultado = consolidar_bancos()
+    resultado = consolidar_bancos(archivo_especifico=archivo_input)
     if resultado is None:
-        print("\n[ERROR] Error en consolidacion. Proceso detenido.")
-        input("\nPresiona ENTER para continuar...")
+        console.print("\n[bold red]❌ Error en consolidación. Proceso detenido.[/bold red]")
+        Prompt.ask("\n[dim]Presiona ENTER para continuar[/dim]")
         return
 
     df_consolidado, archivo_consolidado = resultado
 
-    input("\n[OK] Consolidación completada. Presiona ENTER para continuar...")
+    console.print("\n[bold green]✅ Consolidación completada.[/bold green]")
+    Prompt.ask("[dim]Presiona ENTER para continuar[/dim]")
 
     # PASO 2: Categorizar
-    print("\n" + "=" * 80)
-    print("PASO 2/3: CATEGORIZANDO MOVIMIENTOS")
-    print("=" * 80 + "\n")
+    console.print()
+    console.print(Panel(
+        "[bold cyan]PASO 2/3: CATEGORIZANDO MOVIMIENTOS[/bold cyan]",
+        border_style="cyan",
+        box=box.HEAVY
+    ))
 
     resultado = categorizar_movimientos(
         ruta_archivo_consolidado=archivo_consolidado,
@@ -122,18 +223,22 @@ def proceso_completo():
     )
 
     if resultado is None:
-        print("\n[ERROR] Error en categorización. Proceso detenido.")
-        input("\nPresiona ENTER para continuar...")
+        console.print("\n[bold red]❌ Error en categorización. Proceso detenido.[/bold red]")
+        Prompt.ask("\n[dim]Presiona ENTER para continuar[/dim]")
         return
 
     df_categorizado, archivo_categorizado = resultado
 
-    input("\n[OK] Categorización completada. Presiona ENTER para continuar...")
+    console.print("\n[bold green]✅ Categorización completada.[/bold green]")
+    Prompt.ask("[dim]Presiona ENTER para continuar[/dim]")
 
     # PASO 3: Reportes
-    print("\n" + "=" * 80)
-    print("PASO 3/3: GENERANDO REPORTES Y DASHBOARD")
-    print("=" * 80 + "\n")
+    console.print()
+    console.print(Panel(
+        "[bold cyan]PASO 3/3: GENERANDO REPORTES Y DASHBOARD[/bold cyan]",
+        border_style="cyan",
+        box=box.HEAVY
+    ))
 
     resultado = generar_reportes(
         ruta_archivo_categorizado=archivo_categorizado,
@@ -141,326 +246,142 @@ def proceso_completo():
     )
 
     if resultado is None:
-        print("\n[ERROR] Error en generación de reportes.")
-        input("\nPresiona ENTER para continuar...")
+        console.print("\n[bold red]❌ Error en generación de reportes.[/bold red]")
+        Prompt.ask("\n[dim]Presiona ENTER para continuar[/dim]")
         return
 
     # Proceso completo exitoso
-    print("\n" + "=" * 80)
-    print("[OK] PROCESO COMPLETO FINALIZADO EXITOSAMENTE")
-    print("=" * 80)
-    print("\n>> Archivos generados en la carpeta 'output/':")
-    print(f"  - {os.path.basename(archivo_consolidado)}")
-    print(f"  - {os.path.basename(archivo_categorizado)}")
-    print(f"  - reporte_ejecutivo_*.xlsx")
-    print(f"  - dashboard_*.html")
+    console.print()
+    console.print(Panel(
+        f"[bold white]Archivos generados en la carpeta 'output/':[/bold white]\n\n"
+        f"  [green]✓[/green] {os.path.basename(archivo_consolidado)}\n"
+        f"  [green]✓[/green] {os.path.basename(archivo_categorizado)}\n"
+        f"  [green]✓[/green] reporte_ejecutivo_*.xlsx\n"
+        f"  [green]✓[/green] dashboard_*.html",
+        title="[bold green]✅ PROCESO COMPLETO FINALIZADO EXITOSAMENTE[/bold green]",
+        border_style="green",
+        box=box.DOUBLE
+    ))
 
-    input("\nPresiona ENTER para volver al menú principal...")
+    Prompt.ask("\n[dim]Presiona ENTER para volver al menú principal[/dim]")
 
 
 def solo_consolidar():
     """Ejecuta solo el bloque 1: consolidar."""
-    print("\n" + "=" * 80)
-    print(">> BLOQUE 1: CONSOLIDAR EXTRACTOS BANCARIOS")
-    print("=" * 80 + "\n")
+    console.print()
+    console.print(Panel(
+        "[bold cyan]BLOQUE 1: CONSOLIDAR EXTRACTOS BANCARIOS[/bold cyan]",
+        border_style="cyan",
+        box=box.ROUNDED
+    ))
 
-    resultado = consolidar_bancos()
+    # Seleccionar archivo de input
+    archivo_input = seleccionar_archivo_input()
+    if archivo_input is None:
+        Prompt.ask("\n[dim]Presiona ENTER para volver al menú principal[/dim]")
+        return
 
-    if resultado is not None:
-        df_consolidado, archivo_consolidado = resultado
-        # Guardar en la sesión
-        sesion_trabajo['archivo_consolidado'] = archivo_consolidado
-        sesion_trabajo['archivo_categorizado'] = None  # Resetear categorizado
-        sesion_trabajo['archivos_input_usados'] = ['Todos los archivos de ./input']
+    consolidar_bancos(archivo_especifico=archivo_input)
 
-        print("\n" + "=" * 80)
-        print("[SESION ACTUALIZADA]")
-        print(f"Archivo listo para CATEGORIZAR (Opcion 4)")
-        print("=" * 80)
-
-    input("\nPresiona ENTER para volver al menú principal...")
+    Prompt.ask("\n[dim]Presiona ENTER para volver al menú principal[/dim]")
 
 
 def solo_categorizar():
     """Ejecuta solo el bloque 2: categorizar."""
-    print("\n" + "=" * 80)
-    print(">>  BLOQUE 2: CATEGORIZAR MOVIMIENTOS")
-    print("=" * 80 + "\n")
+    console.print()
+    console.print(Panel(
+        "[bold cyan]BLOQUE 2: CATEGORIZAR MOVIMIENTOS[/bold cyan]",
+        border_style="cyan",
+        box=box.ROUNDED
+    ))
 
-    # Usar archivo de la sesión si existe
-    archivo_a_usar = sesion_trabajo.get('archivo_consolidado')
+    categorizar_movimientos()
 
-    if archivo_a_usar:
-        print(f"[SESION] Usando archivo consolidado: {os.path.basename(archivo_a_usar)}\n")
-
-    resultado = categorizar_movimientos(ruta_archivo_consolidado=archivo_a_usar)
-
-    if resultado is not None:
-        df_categorizado, archivo_categorizado = resultado
-        # Guardar en la sesión
-        sesion_trabajo['archivo_categorizado'] = archivo_categorizado
-
-        print("\n" + "=" * 80)
-        print("[SESION ACTUALIZADA]")
-        print(f"Archivo listo para generar REPORTES (Opcion 5)")
-        print("=" * 80)
-
-    input("\nPresiona ENTER para volver al menú principal...")
+    Prompt.ask("\n[dim]Presiona ENTER para volver al menú principal[/dim]")
 
 
 def solo_reportes():
     """Ejecuta solo el bloque 3: reportes."""
-    print("\n" + "=" * 80)
-    print(">> BLOQUE 3: GENERAR REPORTES Y DASHBOARD")
-    print("=" * 80 + "\n")
+    console.print()
+    console.print(Panel(
+        "[bold cyan]BLOQUE 3: GENERAR REPORTES Y DASHBOARD[/bold cyan]",
+        border_style="cyan",
+        box=box.ROUNDED
+    ))
 
-    # Usar archivo de la sesión si existe
-    archivo_a_usar = sesion_trabajo.get('archivo_categorizado')
+    generar_reportes()
 
-    if archivo_a_usar:
-        print(f"[SESION] Usando archivo categorizado: {os.path.basename(archivo_a_usar)}\n")
-    else:
-        # No hay sesión, intentar buscar archivo más reciente
-        from glob import glob
-        archivos_categorizados = glob(os.path.join("./output", "movimientos_categorizados_*.xlsx"))
-
-        if not archivos_categorizados:
-            print("[ERROR] No se puede generar el reporte.")
-            print("\nMotivo: No hay archivo categorizado disponible.")
-            print("\nSoluciones:")
-            print("  1. Ejecuta primero el flujo completo:")
-            print("     - Opcion 2 o 3: Consolidar")
-            print("     - Opcion 4: Categorizar")
-            print("     - Opcion 5: Reportes (esta opcion)")
-            print("\n  2. O usa la Opcion 1 (Proceso completo automatico)")
-            input("\nPresiona ENTER para volver al menú principal...")
-            return
-
-        # Hay archivos antiguos, usar el más reciente
-        print("[INFO] No hay sesión activa.")
-        print("Se usará el archivo categorizado más reciente encontrado en ./output/\n")
-
-    generar_reportes(ruta_archivo_categorizado=archivo_a_usar)
-
-    input("\nPresiona ENTER para volver al menú principal...")
+    Prompt.ask("\n[dim]Presiona ENTER para volver al menú principal[/dim]")
 
 
 def configuracion():
     """Muestra y permite cambiar la configuración."""
-    print("\n" + "=" * 80)
-    print(">>  CONFIGURACIÓN DEL SISTEMA")
-    print("=" * 80 + "\n")
+    console.print()
+    console.print(Panel(
+        "[bold white]Configuración actual:[/bold white]\n\n"
+        "  [cyan]•[/cyan] Carpeta de entrada:  [green]./input[/green]\n"
+        "  [cyan]•[/cyan] Carpeta de salida:   [green]./output[/green]\n\n"
+        "[yellow]Nota:[/yellow] El sistema requiere seleccionar UN archivo específico.\n"
+        "Esto previene errores al mezclar archivos de diferentes períodos.\n\n"
+        "[dim]Para cambiar rutas, usa --input y --output:[/dim]\n"
+        "[dim]python src/main.py --consolidar --archivo MI_ARCHIVO.xlsx --input ./mis_extractos[/dim]",
+        title="[bold cyan]⚙️  CONFIGURACIÓN DEL SISTEMA[/bold cyan]",
+        border_style="cyan",
+        box=box.ROUNDED
+    ))
 
-    print("Configuración actual:")
-    print(f"  - Carpeta de entrada:  ./input")
-    print(f"  - Carpeta de salida:   ./output")
-    print()
-    print("Nota: Para cambiar las rutas, usa los parámetros --input y --output")
-    print("al ejecutar directamente main.py con argumentos.")
-    print()
-    print("Ejemplo:")
-    print("  python src/main.py --consolidar --input ./mis_extractos --output ./resultados")
-
-    input("\nPresiona ENTER para volver al menú principal...")
+    Prompt.ask("\n[dim]Presiona ENTER para volver al menú principal[/dim]")
 
 
 def informacion_sistema():
     """Muestra información sobre el sistema."""
-    print("\n" + "=" * 80)
-    print(">>  INFORMACIÓN DEL SISTEMA")
-    print("=" * 80 + "\n")
+    console.print()
 
-    print("SANARTE - Sistema de Control Financiero")
-    print("Versión: 1.3")
-    print("Autor: Sistema SANARTE")
-    print("Fecha: Noviembre 2025")
-    print()
-    print("BLOQUES IMPLEMENTADOS:")
-    print()
-    print("  [OK] Bloque 1: Consolidador Multi-Banco")
-    print("    - Detección automática de banco")
-    print("    - Soporte Supervielle y Galicia")
-    print("    - Normalización y exportación")
-    print()
-    print("  [OK] Bloque 2: Categorizador Inteligente")
-    print("    - 24 reglas de clasificación")
-    print("    - 80%+ categorización automática")
-    print("    - Sistema de aprendizaje")
-    print("    - Corrección manual interactiva")
-    print()
-    print("  [OK] Bloque 3: Reportes y Dashboard")
-    print("    - Análisis financiero completo")
-    print("    - Dashboard HTML interactivo")
-    print("    - Reporte Excel ejecutivo")
-    print("    - Top prestadores y métricas")
-    print()
-    print("  [OK] Bloque 4: Orquestador CLI (este menú)")
-    print("    - Menú interactivo")
-    print("    - Proceso completo automatizado")
-    print("    - Ejecución individual de bloques")
-    print()
-    print("CATEGORÍAS SOPORTADAS:")
-    print()
-    print("  Ingresos:")
-    print("    - Afiliados DEBIN")
-    print("    - Pacientes Transferencia")
-    print("    - Otros Ingresos")
-    print()
-    print("  Egresos:")
-    print("    - Prestadores")
-    print("    - Sueldos")
-    print("    - Impuestos")
-    print("    - Comisiones Bancarias")
-    print("    - Servicios")
-    print("    - Gastos Operativos")
+    # Info básica
+    info_texto = Text()
+    info_texto.append("TORO - Sistema de Resumen de Cuenta\n", style="bold white")
+    info_texto.append("Versión: ", style="dim")
+    info_texto.append("1.3\n", style="bold green")
+    info_texto.append("Autor: ", style="dim")
+    info_texto.append("Sistema TORO\n", style="cyan")
+    info_texto.append("Fecha: ", style="dim")
+    info_texto.append("Noviembre 2025", style="white")
 
-    input("\nPresiona ENTER para volver al menú principal...")
+    console.print(Panel(info_texto, title="[bold cyan]ℹ️  INFORMACIÓN DEL SISTEMA[/bold cyan]", border_style="cyan", box=box.ROUNDED))
 
+    # Bloques implementados
+    console.print()
+    tabla_bloques = Table(box=box.SIMPLE, show_header=False, padding=(0, 1))
+    tabla_bloques.add_column("", style="green", width=4)
+    tabla_bloques.add_column("Bloque", style="bold white")
+    tabla_bloques.add_column("Características", style="dim")
 
-def seleccionar_archivos_excel():
-    """
-    Muestra los archivos Excel disponibles y permite seleccionar cuáles procesar.
+    tabla_bloques.add_row("✓", "Bloque 1: Consolidador Multi-Banco", "Detección automática • Supervielle y Galicia")
+    tabla_bloques.add_row("✓", "Bloque 2: Categorizador Inteligente", "37 reglas • 99%+ clasificación automática")
+    tabla_bloques.add_row("✓", "Bloque 3: Reportes y Dashboard", "Dashboard HTML • Reporte Excel ejecutivo")
+    tabla_bloques.add_row("✓", "Bloque 4: Orquestador CLI", "Menú interactivo • Proceso automatizado")
 
-    Returns:
-        Lista de nombres de archivos seleccionados o None si se cancela
-    """
-    ruta_input = "./input"
+    console.print(Panel(tabla_bloques, title="[bold white]BLOQUES IMPLEMENTADOS[/bold white]", border_style="green", box=box.ROUNDED))
 
-    # Buscar archivos Excel
-    archivos_completos = glob(os.path.join(ruta_input, "*.xlsx"))
+    # Categorías
+    console.print()
+    categorias_texto = (
+        "[bold white]Ingresos:[/bold white]\n"
+        "  [cyan]•[/cyan] Afiliados DEBIN\n"
+        "  [cyan]•[/cyan] Transferencias\n"
+        "  [cyan]•[/cyan] Cheques y Obras Sociales\n\n"
+        "[bold white]Egresos:[/bold white]\n"
+        "  [cyan]•[/cyan] Prestadores\n"
+        "  [cyan]•[/cyan] Sueldos\n"
+        "  [cyan]•[/cyan] Impuestos (AFIP, IVA, Percepciones)\n"
+        "  [cyan]•[/cyan] Comisiones Bancarias\n"
+        "  [cyan]•[/cyan] Servicios (Luz, Gas, Internet)\n"
+        "  [cyan]•[/cyan] Gastos Operativos"
+    )
 
-    if not archivos_completos:
-        print(f"\n[ERROR] No se encontraron archivos Excel (.xlsx) en '{ruta_input}'")
-        print(f"Por favor, coloca los extractos bancarios en esa carpeta.")
-        return None
+    console.print(Panel(categorias_texto, title="[bold white]CATEGORÍAS SOPORTADAS[/bold white]", border_style="yellow", box=box.ROUNDED))
 
-    # Obtener solo los nombres de archivo (sin ruta)
-    archivos = [os.path.basename(f) for f in archivos_completos]
-
-    print("\n" + "=" * 80)
-    print("ARCHIVOS EXCEL DISPONIBLES EN ./input/")
-    print("=" * 80 + "\n")
-
-    # Mostrar lista numerada
-    for i, archivo in enumerate(archivos, 1):
-        print(f"  {i}. {archivo}")
-
-    print("\n" + "-" * 80)
-    print("INSTRUCCIONES:")
-    print("  - Para seleccionar archivos, ingresa los números separados por comas")
-    print("  - Ejemplos: '1' para el primero, '1,3' para el 1 y 3, '1,2,3' para todos")
-    print("  - Presiona ENTER sin ingresar nada para CANCELAR")
-    print("-" * 80 + "\n")
-
-    seleccion = input("Ingresa tu selección: ").strip()
-
-    if not seleccion:
-        print("\n[INFO] Selección cancelada.")
-        return None
-
-    try:
-        # Parsear la selección
-        indices = [int(x.strip()) for x in seleccion.split(',')]
-
-        # Validar que los índices estén en rango
-        archivos_seleccionados = []
-        for idx in indices:
-            if 1 <= idx <= len(archivos):
-                archivos_seleccionados.append(archivos[idx - 1])
-            else:
-                print(f"\n[ADVERTENCIA] Número {idx} fuera de rango. Ignorando...")
-
-        if not archivos_seleccionados:
-            print("\n[ERROR] No se seleccionó ningún archivo válido.")
-            return None
-
-        # Mostrar confirmación
-        print("\n" + "=" * 80)
-        print("ARCHIVOS SELECCIONADOS:")
-        print("=" * 80)
-        for archivo in archivos_seleccionados:
-            print(f"  - {archivo}")
-        print()
-
-        confirmacion = input("¿Confirmar selección? (S/N): ").strip().upper()
-        if confirmacion not in ['S', 'SI', 'Y', 'YES']:
-            print("\n[INFO] Selección cancelada.")
-            return None
-
-        return archivos_seleccionados
-
-    except ValueError:
-        print("\n[ERROR] Formato inválido. Debes ingresar números separados por comas.")
-        return None
-
-
-def limpiar_sesion():
-    """Limpia la sesión de trabajo actual."""
-    print("\n" + "=" * 80)
-    print(">> LIMPIAR SESION DE TRABAJO")
-    print("=" * 80 + "\n")
-
-    if not sesion_trabajo['archivo_consolidado'] and not sesion_trabajo['archivo_categorizado']:
-        print("[INFO] No hay sesión activa. Nada que limpiar.")
-        input("\nPresiona ENTER para volver al menú principal...")
-        return
-
-    print("Sesión actual:")
-    if sesion_trabajo['archivos_input_usados']:
-        print(f"  Archivos input: {', '.join(sesion_trabajo['archivos_input_usados'])}")
-    if sesion_trabajo['archivo_consolidado']:
-        print(f"  Consolidado: {os.path.basename(sesion_trabajo['archivo_consolidado'])}")
-    if sesion_trabajo['archivo_categorizado']:
-        print(f"  Categorizado: {os.path.basename(sesion_trabajo['archivo_categorizado'])}")
-
-    print("\nEsto permitirá iniciar un nuevo proceso desde cero.")
-    confirmacion = input("\n¿Deseas limpiar la sesión? (S/N): ").strip().upper()
-
-    if confirmacion in ['S', 'SI', 'Y', 'YES']:
-        sesion_trabajo['archivo_consolidado'] = None
-        sesion_trabajo['archivo_categorizado'] = None
-        sesion_trabajo['archivos_input_usados'] = []
-
-        print("\n[OK] Sesión limpiada. Puedes iniciar un nuevo proceso.")
-    else:
-        print("\n[INFO] Sesión no modificada.")
-
-    input("\nPresiona ENTER para volver al menú principal...")
-
-
-def consolidar_con_seleccion():
-    """Ejecuta consolidación con selección manual de archivos."""
-    print("\n" + "=" * 80)
-    print(">> CONSOLIDAR CON SELECCIÓN DE ARCHIVOS")
-    print("=" * 80)
-
-    # Seleccionar archivos
-    archivos_seleccionados = seleccionar_archivos_excel()
-
-    if archivos_seleccionados is None:
-        input("\nPresiona ENTER para volver al menú principal...")
-        return
-
-    # Ejecutar consolidación con archivos seleccionados
-    print("\n" + "=" * 80)
-    print("PROCESANDO ARCHIVOS SELECCIONADOS")
-    print("=" * 80 + "\n")
-
-    resultado = consolidar_bancos(archivos_seleccionados=archivos_seleccionados)
-
-    if resultado is not None:
-        df_consolidado, archivo_consolidado = resultado
-        # Guardar en la sesión
-        sesion_trabajo['archivo_consolidado'] = archivo_consolidado
-        sesion_trabajo['archivo_categorizado'] = None  # Resetear categorizado
-        sesion_trabajo['archivos_input_usados'] = archivos_seleccionados
-
-        print("\n" + "=" * 80)
-        print("[SESION ACTUALIZADA]")
-        print(f"Archivo listo para CATEGORIZAR (Opcion 4)")
-        print("=" * 80)
-
-    input("\nPresiona ENTER para volver al menú principal...")
+    Prompt.ask("\n[dim]Presiona ENTER para volver al menú principal[/dim]")
 
 
 def main():
@@ -471,12 +392,22 @@ def main():
         mostrar_menu_principal()
 
         try:
-            opcion = input("Selecciona una opción: ").strip()
+            opcion = Prompt.ask(
+                "[bold cyan]Selecciona una opción[/bold cyan]",
+                choices=['0', '1', '2', '3', '4', '5', '6'],
+                default='1'
+            ).strip()
 
             if opcion == '0':
-                print("\n" + "=" * 80)
-                print("¡Gracias por usar SANARTE Control Financiero!")
-                print("=" * 80 + "\n")
+                console.print()
+                console.print(Panel(
+                    "[bold white]¡Gracias por usar TORO - Resumen de Cuenta![/bold white]\n"
+                    "[dim]Sistema v1.3 - Noviembre 2025[/dim]",
+                    title="[bold green]👋 HASTA PRONTO[/bold green]",
+                    border_style="green",
+                    box=box.DOUBLE
+                ))
+                console.print()
                 sys.exit(0)
 
             elif opcion == '1':
@@ -486,36 +417,36 @@ def main():
                 solo_consolidar()
 
             elif opcion == '3':
-                consolidar_con_seleccion()
-
-            elif opcion == '4':
                 solo_categorizar()
 
-            elif opcion == '5':
+            elif opcion == '4':
                 solo_reportes()
 
-            elif opcion == '6':
+            elif opcion == '5':
                 configuracion()
 
-            elif opcion == '7':
+            elif opcion == '6':
                 informacion_sistema()
 
-            elif opcion == '8':
-                limpiar_sesion()
-
             else:
-                print("\n[ERROR] Opción inválida. Por favor selecciona una opción del menú.")
-                input("\nPresiona ENTER para continuar...")
+                console.print("\n[bold red]❌ ERROR:[/bold red] Opción inválida. Por favor selecciona una opción del menú.")
+                Prompt.ask("\n[dim]Presiona ENTER para continuar[/dim]")
 
         except KeyboardInterrupt:
-            print("\n\n" + "=" * 80)
-            print("¡Gracias por usar SANARTE Control Financiero!")
-            print("=" * 80 + "\n")
+            console.print()
+            console.print(Panel(
+                "[bold white]¡Gracias por usar TORO - Resumen de Cuenta![/bold white]\n"
+                "[dim]Sistema v1.3 - Noviembre 2025[/dim]",
+                title="[bold yellow]👋 HASTA PRONTO[/bold yellow]",
+                border_style="yellow",
+                box=box.DOUBLE
+            ))
+            console.print()
             sys.exit(0)
 
         except Exception as e:
-            print(f"\n[ERROR] Error inesperado: {e}")
-            input("\nPresiona ENTER para continuar...")
+            console.print(f"\n[bold red]❌ ERROR INESPERADO:[/bold red] {e}")
+            Prompt.ask("\n[dim]Presiona ENTER para continuar[/dim]")
 
 
 if __name__ == "__main__":

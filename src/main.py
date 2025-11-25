@@ -55,14 +55,14 @@ def detectar_banco(ruta_archivo: str):
         return None, None
 
 
-def consolidar_bancos(ruta_input: str = "./input", ruta_output: str = "./output", archivos_seleccionados: list = None):
+def consolidar_bancos(ruta_input: str = "./input", ruta_output: str = "./output", archivo_especifico: str = None):
     """
     Proceso completo de consolidación de extractos bancarios.
 
     Args:
         ruta_input: Carpeta donde están los archivos Excel
         ruta_output: Carpeta donde se guardarán los resultados
-        archivos_seleccionados: Lista opcional de nombres de archivos específicos a procesar
+        archivo_especifico: Nombre de archivo específico a procesar (opcional)
     """
     print("="*80)
     print("SANARTE - Sistema de Control Financiero")
@@ -75,18 +75,31 @@ def consolidar_bancos(ruta_input: str = "./input", ruta_output: str = "./output"
         print(f"Por favor, crea la carpeta y coloca allí los archivos Excel de los bancos.")
         return
 
-    # Buscar archivos Excel en la carpeta input
-    if archivos_seleccionados:
-        # Usar solo los archivos seleccionados
-        archivos_excel = [os.path.join(ruta_input, archivo) for archivo in archivos_seleccionados]
-    else:
-        # Buscar todos los archivos Excel
-        archivos_excel = glob(os.path.join(ruta_input, "*.xlsx"))
-
-    if not archivos_excel:
-        print(f"\nNo se encontraron archivos Excel (.xlsx) en '{ruta_input}'")
-        print(f"Por favor, coloca los extractos bancarios en esa carpeta.")
+    # Validar que se especifique un archivo
+    if not archivo_especifico:
+        print(f"\nError: Debes especificar un archivo con --archivo")
+        print(f"\nArchivos disponibles en '{ruta_input}':")
+        archivos_disponibles = glob(os.path.join(ruta_input, "*.xlsx"))
+        if archivos_disponibles:
+            for f in archivos_disponibles:
+                print(f"  - {os.path.basename(f)}")
+            print(f"\nEjemplo de uso:")
+            print(f"  python src/main.py --consolidar --archivo {os.path.basename(archivos_disponibles[0])}")
+        else:
+            print(f"  (No se encontraron archivos .xlsx)")
         return
+
+    # Procesar el archivo específico
+    archivo_path = os.path.join(ruta_input, archivo_especifico)
+    if not os.path.exists(archivo_path):
+        print(f"\nError: No se encontró el archivo '{archivo_especifico}' en '{ruta_input}'")
+        print(f"\nArchivos disponibles:")
+        for f in glob(os.path.join(ruta_input, "*.xlsx")):
+            print(f"  - {os.path.basename(f)}")
+        return
+
+    archivos_excel = [archivo_path]
+    print(f"\nProcesando archivo: {archivo_especifico}")
 
     print(f"\nEncontrados {len(archivos_excel)} archivo(s) Excel:")
     for archivo in archivos_excel:
@@ -188,7 +201,7 @@ def categorizar_movimientos(ruta_archivo_consolidado: str = None,
         return
 
     # Crear categorizador
-    categorizer = Categorizer(umbral_confianza=70)
+    categorizer = Categorizer()
 
     # Categorizar
     df_categorizado = categorizer.categorizar_dataframe(df)
@@ -232,7 +245,7 @@ def categorizar_movimientos(ruta_archivo_consolidado: str = None,
     print(f"\nArchivo generado: {ruta_salida}")
 
     # Estadísticas finales
-    total_clasificados = len(df_categorizado[df_categorizado['Categoria'] != 'Sin Clasificar'])
+    total_clasificados = len(df_categorizado[df_categorizado['Categoria_Principal'] != 'Sin Clasificar'])
     porcentaje = (total_clasificados / len(df_categorizado)) * 100
 
     print(f"\nEstadisticas finales:")
@@ -298,7 +311,7 @@ def generar_reportes(ruta_archivo_categorizado: str = None,
     nombre_dashboard = f"dashboard_{fecha_actual.year}_{fecha_actual.month:02d}.html"
     ruta_dashboard = os.path.join(ruta_output, nombre_dashboard)
 
-    dashboard_gen = DashboardGenerator(metricas, df_sin_clasificar)
+    dashboard_gen = DashboardGenerator(df, metricas)
     dashboard_gen.generar_html(ruta_dashboard)
 
     # Generar reporte ejecutivo Excel
@@ -337,11 +350,21 @@ def main():
         epilog="""
 Ejemplos de uso:
 
-  Consolidar extractos bancarios:
-    python main.py --consolidar
+  Consolidar un extracto bancario (--archivo es OBLIGATORIO):
+    python main.py --consolidar --archivo Movimientos_Supervielle_2025_11_18_.xlsx
+
+  Flujo completo (consolidar, categorizar y generar reportes):
+    python main.py --consolidar --archivo Movimientos_Supervielle_2025_11_18_.xlsx
+    python main.py --categorizar --sin-revision
+    python main.py --reportes --sin-abrir
 
   Especificar carpetas personalizadas:
-    python main.py --consolidar --input ./mis_extractos --output ./resultados
+    python main.py --consolidar --archivo MI_ARCHIVO.xlsx --input ./mis_extractos --output ./resultados
+
+IMPORTANTE:
+  - El argumento --archivo es OBLIGATORIO para --consolidar
+  - NO mezcles archivos de diferentes períodos/cuentas (rompe los saldos)
+  - Procesa UN archivo a la vez
 
 Para más información, consulta el README.md
         """
@@ -369,7 +392,7 @@ Para más información, consulta el README.md
         '--archivo',
         type=str,
         default=None,
-        help='Archivo a procesar (default: el más reciente)'
+        help='[OBLIGATORIO con --consolidar] Archivo a procesar en carpeta input/ (ej: Movimientos_Supervielle_2025_11_18_.xlsx). Con --categorizar/--reportes busca el más reciente si no se especifica.'
     )
 
     parser.add_argument(
@@ -407,7 +430,7 @@ Para más información, consulta el README.md
 
     # Ejecutar consolidación
     if args.consolidar:
-        consolidar_bancos(ruta_input=args.input, ruta_output=args.output)
+        consolidar_bancos(ruta_input=args.input, ruta_output=args.output, archivo_especifico=args.archivo)
 
     # Ejecutar categorización
     if args.categorizar:

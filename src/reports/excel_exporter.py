@@ -99,15 +99,19 @@ class ExcelExporter:
             ['DESGLOSE INGRESOS', 'Monto'],
         ])
 
-        # Agregar ingresos por subcategoría
-        for sub, monto in self.metricas['ingresos_por_subcategoria'].items():
+        # Agregar ingresos por subcategoría (ordenados de mayor a menor)
+        ingresos_ordenados = sorted(self.metricas['ingresos_por_subcategoria'].items(),
+                                    key=lambda x: x[1], reverse=True)
+        for sub, monto in ingresos_ordenados:
             datos.append([sub, f"${monto:,.2f}"])
 
         datos.append(['', ''])
         datos.append(['DESGLOSE EGRESOS', 'Monto'])
 
-        # Agregar egresos por subcategoría
-        for sub, monto in self.metricas['egresos_por_subcategoria'].items():
+        # Agregar egresos por subcategoría (ordenados de mayor a menor)
+        egresos_ordenados = sorted(self.metricas['egresos_por_subcategoria'].items(),
+                                   key=lambda x: x[1], reverse=True)
+        for sub, monto in egresos_ordenados:
             datos.append([sub, f"${monto:,.2f}"])
 
         # Crear DataFrame y exportar
@@ -118,7 +122,7 @@ class ExcelExporter:
         """
         Crea la hoja de desglose de ingresos con resumen de saldos.
         """
-        df_ingresos = self.df[self.df['Categoria'] == 'Ingresos'].copy()
+        df_ingresos = self.df[self.df['Tipo_Movimiento'] == 'Ingreso'].copy()
 
         if len(df_ingresos) == 0:
             # Hoja vacía con mensaje
@@ -138,8 +142,10 @@ class ExcelExporter:
             ['DESGLOSE POR SUBCATEGORIA', 'Monto'],
         ]
 
-        # Agregar ingresos por subcategoría
-        for sub, monto in self.metricas['ingresos_por_subcategoria'].items():
+        # Agregar ingresos por subcategoría (ordenados de mayor a menor)
+        ingresos_ordenados = sorted(self.metricas['ingresos_por_subcategoria'].items(),
+                                    key=lambda x: x[1], reverse=True)
+        for sub, monto in ingresos_ordenados:
             porcentaje = (monto / self.metricas['total_ingresos'] * 100) if self.metricas['total_ingresos'] > 0 else 0
             datos_resumen.append([sub, f"${monto:,.2f} ({porcentaje:.1f}%)"])
 
@@ -153,7 +159,7 @@ class ExcelExporter:
         df_resumen = pd.DataFrame(datos_resumen, columns=['Concepto', 'Valor'])
 
         # Seleccionar columnas relevantes
-        columnas = ['Fecha', 'Concepto', 'Detalle', 'Crédito', 'Subcategoria',
+        columnas = ['Fecha', 'Concepto', 'Detalle', 'Crédito', 'Categoria_Final',
                    'Persona_Nombre', 'Es_DEBIN', 'Banco']
 
         df_export = df_ingresos[columnas].copy()
@@ -173,7 +179,7 @@ class ExcelExporter:
         """
         Crea la hoja de desglose de egresos con resumen de saldos.
         """
-        df_egresos = self.df[self.df['Categoria'] == 'Egresos'].copy()
+        df_egresos = self.df[self.df['Tipo_Movimiento'] == 'Egreso'].copy()
 
         if len(df_egresos) == 0:
             pd.DataFrame(['No hay egresos registrados']).to_excel(writer, sheet_name='Egresos', index=False, header=False)
@@ -192,8 +198,10 @@ class ExcelExporter:
             ['DESGLOSE POR SUBCATEGORIA', 'Monto'],
         ]
 
-        # Agregar egresos por subcategoría
-        for sub, monto in self.metricas['egresos_por_subcategoria'].items():
+        # Agregar egresos por subcategoría (ordenados de mayor a menor)
+        egresos_ordenados = sorted(self.metricas['egresos_por_subcategoria'].items(),
+                                   key=lambda x: x[1], reverse=True)
+        for sub, monto in egresos_ordenados:
             porcentaje = (monto / self.metricas['total_egresos'] * 100) if self.metricas['total_egresos'] > 0 else 0
             datos_resumen.append([sub, f"${monto:,.2f} ({porcentaje:.1f}%)"])
 
@@ -207,7 +215,7 @@ class ExcelExporter:
         df_resumen = pd.DataFrame(datos_resumen, columns=['Concepto', 'Valor'])
 
         # Seleccionar columnas relevantes de egresos
-        columnas = ['Fecha', 'Concepto', 'Detalle', 'Débito', 'Subcategoria',
+        columnas = ['Fecha', 'Concepto', 'Detalle', 'Débito', 'Categoria_Final',
                    'Persona_Nombre', 'Banco']
 
         df_export = df_egresos[columnas].copy()
@@ -225,31 +233,60 @@ class ExcelExporter:
 
     def _crear_hoja_prestadores(self, writer):
         """
-        Crea la hoja de top prestadores.
+        Crea la hoja de Top 15 Egresos (todos los egresos, no solo prestadores).
         """
-        if len(self.metricas['top_prestadores']) == 0:
-            pd.DataFrame(['No hay prestadores registrados']).to_excel(writer, sheet_name='Prestadores', index=False, header=False)
+        # Filtrar todos los egresos
+        df_egresos = self.df[self.df['Tipo_Movimiento'] == 'Egreso'].copy()
+
+        if len(df_egresos) == 0:
+            pd.DataFrame(['No hay egresos registrados']).to_excel(writer, sheet_name='Top Egresos', index=False, header=False)
             return
 
-        # Crear DataFrame de prestadores
-        datos = []
-        for i, prestador in enumerate(self.metricas['top_prestadores'], 1):
-            datos.append({
-                'Ranking': i,
-                'Nombre': prestador['nombre'],
-                'Monto Total': prestador['monto']
-            })
+        # Calcular resumen
+        total_egresos = df_egresos['Débito'].sum()
+        cantidad_egresos = len(df_egresos)
+        promedio_egreso = total_egresos / cantidad_egresos if cantidad_egresos > 0 else 0
 
-        df_prestadores = pd.DataFrame(datos)
+        # Crear resumen
+        datos_resumen = [
+            ['TOP 15 EGRESOS MÁS GRANDES', ''],
+            ['', ''],
+            ['RESUMEN DE EGRESOS', ''],
+            ['Total de Egresos', f"${total_egresos:,.2f}"],
+            ['Cantidad de Egresos', f"{cantidad_egresos:,}"],
+            ['Promedio por Egreso', f"${promedio_egreso:,.2f}"],
+            ['', ''],
+            ['', ''],
+            ['DETALLE - TOP 15 MAYORES EGRESOS', ''],
+        ]
 
-        # Exportar
-        df_prestadores.to_excel(writer, sheet_name='Prestadores', index=False)
+        df_resumen = pd.DataFrame(datos_resumen, columns=['Concepto', 'Valor'])
+
+        # Ordenar egresos por monto (mayor a menor) y tomar top 15
+        df_top = df_egresos.nlargest(15, 'Débito').copy()
+
+        # Agregar ranking
+        df_top.insert(0, 'Ranking', range(1, len(df_top) + 1))
+
+        # Seleccionar columnas relevantes
+        columnas = ['Ranking', 'Fecha', 'Concepto', 'Detalle', 'Categoria_Final', 'Débito']
+        df_export = df_top[columnas].copy()
+
+        # Renombrar columna Débito a Monto para mayor claridad
+        df_export = df_export.rename(columns={'Débito': 'Monto'})
+
+        # Exportar resumen primero
+        df_resumen.to_excel(writer, sheet_name='Top Egresos', index=False, startrow=0)
+
+        # Luego exportar el detalle
+        start_row = len(df_resumen) + 2
+        df_export.to_excel(writer, sheet_name='Top Egresos', index=False, startrow=start_row)
 
     def _crear_hoja_sin_clasificar(self, writer):
         """
         Crea la hoja de movimientos sin clasificar.
         """
-        df_sin_clasificar = self.df[self.df['Categoria'] == 'Sin Clasificar'].copy()
+        df_sin_clasificar = self.df[self.df['Categoria_Principal'] == 'Sin Clasificar'].copy()
 
         if len(df_sin_clasificar) == 0:
             pd.DataFrame(['Todos los movimientos estan clasificados']).to_excel(writer, sheet_name='Sin Clasificar', index=False, header=False)
@@ -319,8 +356,8 @@ class ExcelExporter:
                         cell.alignment = header_alignment
                         cell.border = border
 
-            # Si es la hoja de Resumen, Ingresos o Egresos, aplicar formato especial
-            if sheet_name in ['Resumen', 'Ingresos', 'Egresos']:
+            # Si es la hoja de Resumen, Ingresos, Egresos o Top Egresos, aplicar formato especial
+            if sheet_name in ['Resumen', 'Ingresos', 'Egresos', 'Top Egresos']:
                 ws['A1'].font = Font(bold=True, size=16, color='4472C4')
                 ws['A1'].alignment = title_alignment
 

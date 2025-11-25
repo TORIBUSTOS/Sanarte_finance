@@ -4,26 +4,35 @@ __pycache__/
 *$py.class
 *.so
 .Python
-
-# Archivos de output (reportes generados)
-output/*.xlsx
-output/*.html
-
-# Archivos de input (extractos bancarios con datos sensibles)
-input/*.xlsx
-!input/Ejemplo_*.xlsx
-
-# Entornos virtuales
-venv/
 env/
+venv/
 ENV/
+*.egg-info/
+dist/
+build/
 
-# IDE
+# IDEs
 .vscode/
 .idea/
 *.swp
 *.swo
+*~
 
-# Sistema operativo
+# OS
 .DS_Store
 Thumbs.db
+
+# Archivos temporales
+*.tmp
+*.bak
+*.log
+
+# Datos sensibles
+*.env
+.env.local
+credentials.json
+
+# Archivos generados
+output/*.xlsx
+output/*.html
+output/*.pdf

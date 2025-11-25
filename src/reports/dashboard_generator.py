@@ -12,14 +12,17 @@ class DashboardGenerator:
     Genera dashboard HTML interactivo con Chart.js.
     """
 
-    def __init__(self, metricas: Dict, df_sin_clasificar: pd.DataFrame):
+    def __init__(self, df: pd.DataFrame, metricas: Dict):
         """
         Args:
+            df: DataFrame con movimientos categorizados (con columnas Tipo_Movimiento, Categoria_Final)
             metricas: Diccionario con métricas calculadas
-            df_sin_clasificar: DataFrame con movimientos sin clasificar
         """
+        self.df = df
         self.metricas = metricas
-        self.df_sin_clasificar = df_sin_clasificar
+
+        # Filtrar sin clasificar
+        self.df_sin_clasificar = df[df['Categoria_Principal'] == 'Sin Clasificar'].copy()
 
     def generar_html(self, ruta_salida: str):
         """
@@ -44,9 +47,16 @@ class DashboardGenerator:
         Returns:
             String con el HTML
         """
+        # Calcular datos REALES desde el DataFrame categorizado
+        ingresos_por_categoria = self._calcular_ingresos_por_categoria()
+        egresos_por_categoria = self._calcular_egresos_por_categoria()
+        kpis = self._calcular_kpis_adicionales()
+        resumen_categorias = self._calcular_resumen_categorias()
+        alertas = self._generar_alertas()
+
         # Preparar datos para gráficos
-        datos_ingresos = self._preparar_datos_torta(self.metricas['ingresos_por_subcategoria'])
-        datos_egresos = self._preparar_datos_torta(self.metricas['egresos_por_subcategoria'])
+        datos_ingresos = self._preparar_datos_torta(ingresos_por_categoria)
+        datos_egresos = self._preparar_datos_torta(egresos_por_categoria)
         datos_flujo = self._preparar_datos_flujo(self.metricas['flujo_diario'])
 
         # Color del balance
@@ -145,6 +155,22 @@ class DashboardGenerator:
             border-color: #17a2b8;
         }}
 
+        .card.debin {{
+            border-color: #28a745;
+        }}
+
+        .card.prestadores {{
+            border-color: #e83e8c;
+        }}
+
+        .card.mayor-egreso {{
+            border-color: #dc3545;
+        }}
+
+        .card.mayor-ingreso {{
+            border-color: #20c997;
+        }}
+
         .card-title {{
             font-size: 0.9em;
             color: #666;
@@ -181,6 +207,22 @@ class DashboardGenerator:
 
         .card.saldo-final .card-value {{
             color: #17a2b8;
+        }}
+
+        .card.debin .card-value {{
+            color: #28a745;
+        }}
+
+        .card.prestadores .card-value {{
+            color: #e83e8c;
+        }}
+
+        .card.mayor-egreso .card-value {{
+            color: #dc3545;
+        }}
+
+        .card.mayor-ingreso .card-value {{
+            color: #20c997;
         }}
 
         .card-subtitle {{
@@ -250,6 +292,55 @@ class DashboardGenerator:
             color: #721c24;
         }}
 
+        .alert-info {{
+            background-color: #d1ecf1;
+            border-color: #17a2b8;
+            color: #0c5460;
+        }}
+
+        .alert-success {{
+            background-color: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }}
+
+        .summary-table {{
+            width: 100%;
+            margin-top: 15px;
+        }}
+
+        .summary-table th {{
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: right;
+        }}
+
+        .summary-table th:first-child {{
+            text-align: left;
+        }}
+
+        .summary-table td {{
+            padding: 10px;
+            text-align: right;
+            border-bottom: 1px solid #e0e0e0;
+        }}
+
+        .summary-table td:first-child {{
+            text-align: left;
+            font-weight: 600;
+        }}
+
+        .summary-table .neto-positivo {{
+            color: #28a745;
+            font-weight: 600;
+        }}
+
+        .summary-table .neto-negativo {{
+            color: #dc3545;
+            font-weight: 600;
+        }}
+
         .footer {{
             background: #f8f9fa;
             padding: 20px;
@@ -277,9 +368,8 @@ class DashboardGenerator:
         </div>
 
         <div class="content">
-            <!-- Alertas -->
-            {'<div class="alert alert-danger"><strong>ALERTA:</strong> Los egresos superan a los ingresos en este período.</div>' if self.metricas['alerta_egresos_mayores'] else ''}
-            {'<div class="alert"><strong>ADVERTENCIA:</strong> Diferencia en validación de saldos: $' + f"{self.metricas['diferencia_validacion']:,.2f}" + '. El saldo final no coincide con la fórmula esperada.</div>' if not self.metricas['validacion_saldos_ok'] else ''}
+            <!-- Alertas Inteligentes -->
+            {alertas}
 
             <!-- Cards de métricas principales -->
             <div class="cards">
@@ -313,6 +403,30 @@ class DashboardGenerator:
                     <div class="card-value">{self.metricas['porcentaje_clasificado']:.1f}%</div>
                     <div class="card-subtitle">{self.metricas['movimientos_clasificados']} de {self.metricas['total_movimientos']}</div>
                 </div>
+
+                <div class="card debin">
+                    <div class="card-title">💳 Ingresos DEBIN</div>
+                    <div class="card-value">${kpis['ingresos_debin_monto']:,.2f}</div>
+                    <div class="card-subtitle">{kpis['ingresos_debin_cant']} transacciones</div>
+                </div>
+
+                <div class="card prestadores">
+                    <div class="card-title">👥 Prestadores Activos</div>
+                    <div class="card-value">{kpis['prestadores_activos']}</div>
+                    <div class="card-subtitle">Total pagado: ${kpis['prestadores_total']:,.0f}</div>
+                </div>
+
+                <div class="card mayor-egreso">
+                    <div class="card-title">💰 Mayor Categoría Egreso</div>
+                    <div class="card-value">${kpis['mayor_cat_egreso_monto']:,.0f}</div>
+                    <div class="card-subtitle">{kpis['mayor_cat_egreso_nombre'][:30]} ({kpis['mayor_cat_egreso_pct']:.1f}%)</div>
+                </div>
+
+                <div class="card mayor-ingreso">
+                    <div class="card-title">📊 Mayor Categoría Ingreso</div>
+                    <div class="card-value">${kpis['mayor_cat_ingreso_monto']:,.0f}</div>
+                    <div class="card-subtitle">{kpis['mayor_cat_ingreso_nombre'][:30]} ({kpis['mayor_cat_ingreso_pct']:.1f}%)</div>
+                </div>
             </div>
 
             <!-- Gráficos -->
@@ -325,7 +439,7 @@ class DashboardGenerator:
 
                 <!-- Gráfico de Egresos -->
                 <div class="chart-container">
-                    <div class="chart-title">Egresos por Categoría</div>
+                    <div class="chart-title">Top 10 Egresos por Categoría</div>
                     <canvas id="chartEgresos"></canvas>
                 </div>
 
@@ -334,6 +448,25 @@ class DashboardGenerator:
                     <div class="chart-title">Flujo de Caja Diario</div>
                     <canvas id="chartFlujo"></canvas>
                 </div>
+            </div>
+
+            <!-- Tabla Resumen por Categoría Principal -->
+            <div class="chart-container chart-full">
+                <div class="chart-title">📊 Resumen por Categoría Principal</div>
+                <table class="summary-table">
+                    <thead>
+                        <tr>
+                            <th>Categoría</th>
+                            <th>Transacciones</th>
+                            <th>Ingresos</th>
+                            <th>Egresos</th>
+                            <th>Neto</th>
+                        </tr>
+                    </thead>
+                    <tbody id="summaryTableBody">
+                        <!-- Generado dinámicamente por JavaScript -->
+                    </tbody>
+                </table>
             </div>
 
             <!-- Tabla de Top Prestadores -->
@@ -353,6 +486,22 @@ class DashboardGenerator:
         const datosIngresos = {datos_ingresos};
         const datosEgresos = {datos_egresos};
         const datosFlujo = {datos_flujo};
+        const resumenCategorias = {resumen_categorias};
+
+        // Llenar tabla de resumen por categoría principal
+        const summaryTableBody = document.getElementById('summaryTableBody');
+        resumenCategorias.forEach(cat => {{
+            const row = document.createElement('tr');
+            const netoClass = cat.neto >= 0 ? 'neto-positivo' : 'neto-negativo';
+            row.innerHTML = `
+                <td>${{cat.categoria}}</td>
+                <td>${{cat.transacciones.toLocaleString('es-AR')}}</td>
+                <td>$${{cat.ingresos.toLocaleString('es-AR', {{minimumFractionDigits: 0, maximumFractionDigits: 0}})}}</td>
+                <td>$${{cat.egresos.toLocaleString('es-AR', {{minimumFractionDigits: 0, maximumFractionDigits: 0}})}}</td>
+                <td class="${{netoClass}}">$${{cat.neto.toLocaleString('es-AR', {{minimumFractionDigits: 0, maximumFractionDigits: 0}})}}</td>
+            `;
+            summaryTableBody.appendChild(row);
+        }});
 
         // Gráfico de Ingresos (Torta)
         new Chart(document.getElementById('chartIngresos'), {{
@@ -394,7 +543,7 @@ class DashboardGenerator:
             }}
         }});
 
-        // Gráfico de Egresos (Torta)
+        // Gráfico de Egresos (Torta - Top 10)
         new Chart(document.getElementById('chartEgresos'), {{
             type: 'pie',
             data: {{
@@ -402,12 +551,16 @@ class DashboardGenerator:
                 datasets: [{{
                     data: datosEgresos.values,
                     backgroundColor: [
-                        '#dc3545',
-                        '#fd7e14',
-                        '#ffc107',
-                        '#e83e8c',
-                        '#6f42c1',
-                        '#6c757d'
+                        '#dc3545', // Rojo
+                        '#fd7e14', // Naranja
+                        '#ff6b6b', // Rojo claro
+                        '#e83e8c', // Rosa
+                        '#9b59b6', // Púrpura
+                        '#ffc107', // Amarillo
+                        '#f39c12', // Naranja oscuro
+                        '#17a2b8', // Azul
+                        '#3498db', // Azul claro
+                        '#6c757d'  // Gris
                     ],
                     borderWidth: 2,
                     borderColor: '#fff'
@@ -495,6 +648,203 @@ class DashboardGenerator:
 </html>"""
 
         return html
+
+    def _calcular_ingresos_por_categoria(self) -> Dict[str, float]:
+        """
+        Calcula ingresos REALES por Categoria_Final desde el DataFrame.
+
+        Returns:
+            Diccionario {categoria_final: monto}
+        """
+        df_ingresos = self.df[self.df['Tipo_Movimiento'] == 'Ingreso'].copy()
+
+        if len(df_ingresos) == 0:
+            return {}
+
+        # Agrupar por Categoria_Final y sumar Crédito
+        ingresos_por_cat = df_ingresos.groupby('Categoria_Final')['Crédito'].sum()
+
+        # Ordenar de mayor a menor
+        ingresos_por_cat = ingresos_por_cat.sort_values(ascending=False)
+
+        return ingresos_por_cat.to_dict()
+
+    def _calcular_egresos_por_categoria(self) -> Dict[str, float]:
+        """
+        Calcula Top 10 egresos por Categoria_Final desde el DataFrame.
+
+        Returns:
+            Diccionario {categoria_final: monto} - Solo Top 10
+        """
+        df_egresos = self.df[self.df['Tipo_Movimiento'] == 'Egreso'].copy()
+
+        if len(df_egresos) == 0:
+            return {}
+
+        # Agrupar por Categoria_Final y sumar Débito
+        egresos_por_cat = df_egresos.groupby('Categoria_Final')['Débito'].sum()
+
+        # Ordenar de mayor a menor y tomar Top 10
+        egresos_por_cat = egresos_por_cat.sort_values(ascending=False).head(10)
+
+        return egresos_por_cat.to_dict()
+
+    def _generar_alertas(self) -> str:
+        """
+        Genera alertas inteligentes HTML basadas en los datos.
+
+        Returns:
+            String HTML con alertas
+        """
+        alertas_html = []
+
+        # Alerta 1: Clasificación completa
+        pct_clasificado = self.metricas['porcentaje_clasificado']
+        if pct_clasificado == 100:
+            alertas_html.append(
+                '<div class="alert alert-success">'
+                f'<strong>✅ Sistema funcionando:</strong> {self.metricas["movimientos_clasificados"]} transacciones clasificadas (100%)'
+                '</div>'
+            )
+        elif pct_clasificado >= 95:
+            alertas_html.append(
+                '<div class="alert alert-info">'
+                f'<strong>📊 Buena clasificación:</strong> {self.metricas["movimientos_clasificados"]} de {self.metricas["total_movimientos"]} clasificadas ({pct_clasificado:.1f}%)'
+                '</div>'
+            )
+
+        # Alerta 2: Sueldos altos
+        df_sueldos = self.df[self.df['Categoria_Final'].str.contains('Sueldos', case=False, na=False)]
+        if len(df_sueldos) > 0:
+            total_sueldos = df_sueldos['Débito'].sum()
+            pct_sueldos = (total_sueldos / self.metricas['total_egresos'] * 100) if self.metricas['total_egresos'] > 0 else 0
+            if pct_sueldos > 20:
+                alertas_html.append(
+                    '<div class="alert alert-warning">'
+                    f'<strong>⚠️ Sueldos altos:</strong> Representan {pct_sueldos:.1f}% de egresos totales (${total_sueldos:,.0f})'
+                    '</div>'
+                )
+
+        # Alerta 3: Red prestacional
+        df_prestadores = self.df[self.df['Categoria_Principal'] == 'Prestadores']
+        if len(df_prestadores) > 0:
+            n_prestadores = df_prestadores['Persona_Nombre'].nunique()
+            total_prestadores = df_prestadores['Débito'].sum()
+            alertas_html.append(
+                '<div class="alert alert-info">'
+                f'<strong>📊 Red prestacional:</strong> {n_prestadores} prestadores activos este mes (${total_prestadores:,.0f} total)'
+                '</div>'
+            )
+
+        # Alerta 4: Ingresos DEBIN
+        if 'Es_DEBIN' in self.df.columns:
+            df_debin = self.df[(self.df['Tipo_Movimiento'] == 'Ingreso') & (self.df['Es_DEBIN'] == True)]
+            if len(df_debin) > 0:
+                total_debin = df_debin['Crédito'].sum()
+                promedio_debin = df_debin['Crédito'].mean()
+                alertas_html.append(
+                    '<div class="alert alert-info">'
+                    f'<strong>💳 Ingresos por DEBIN:</strong> {len(df_debin)} transacciones por ${total_debin:,.0f} (promedio ${promedio_debin:,.0f})'
+                    '</div>'
+                )
+
+        # Alerta 5: Egresos superan ingresos (ya existente)
+        if self.metricas['alerta_egresos_mayores']:
+            alertas_html.append(
+                '<div class="alert alert-danger">'
+                '<strong>⚠️ ALERTA:</strong> Los egresos superan a los ingresos en este período.'
+                '</div>'
+            )
+
+        # Alerta 6: Diferencia en validación (ya existente)
+        if not self.metricas['validacion_saldos_ok']:
+            alertas_html.append(
+                '<div class="alert alert-warning">'
+                f'<strong>⚠️ ADVERTENCIA:</strong> Diferencia en validación de saldos: ${self.metricas["diferencia_validacion"]:,.2f}. '
+                'El saldo final no coincide con la fórmula esperada.'
+                '</div>'
+            )
+
+        return '\n'.join(alertas_html)
+
+    def _calcular_kpis_adicionales(self) -> Dict:
+        """
+        Calcula KPIs adicionales para el dashboard.
+
+        Returns:
+            Diccionario con KPIs: ingresos_debin, prestadores_activos, mayor_cat_egreso, mayor_cat_ingreso
+        """
+        kpis = {}
+
+        # Ingresos DEBIN
+        df_debin = self.df[(self.df['Tipo_Movimiento'] == 'Ingreso') & (self.df['Es_DEBIN'] == True)]
+        kpis['ingresos_debin_monto'] = df_debin['Crédito'].sum()
+        kpis['ingresos_debin_cant'] = len(df_debin)
+
+        # Prestadores Activos
+        df_prestadores = self.df[self.df['Categoria_Principal'] == 'Prestadores']
+        kpis['prestadores_activos'] = df_prestadores['Persona_Nombre'].nunique()
+        kpis['prestadores_total'] = df_prestadores['Débito'].sum()
+
+        # Mayor categoría de egreso
+        egresos_por_cat = self.df[self.df['Tipo_Movimiento'] == 'Egreso'].groupby('Categoria_Final')['Débito'].sum()
+        if len(egresos_por_cat) > 0:
+            mayor_egreso = egresos_por_cat.idxmax()
+            kpis['mayor_cat_egreso_nombre'] = mayor_egreso
+            kpis['mayor_cat_egreso_monto'] = egresos_por_cat[mayor_egreso]
+            kpis['mayor_cat_egreso_pct'] = (egresos_por_cat[mayor_egreso] / self.metricas['total_egresos'] * 100) if self.metricas['total_egresos'] > 0 else 0
+        else:
+            kpis['mayor_cat_egreso_nombre'] = 'N/A'
+            kpis['mayor_cat_egreso_monto'] = 0
+            kpis['mayor_cat_egreso_pct'] = 0
+
+        # Mayor categoría de ingreso
+        ingresos_por_cat = self.df[self.df['Tipo_Movimiento'] == 'Ingreso'].groupby('Categoria_Final')['Crédito'].sum()
+        if len(ingresos_por_cat) > 0:
+            mayor_ingreso = ingresos_por_cat.idxmax()
+            kpis['mayor_cat_ingreso_nombre'] = mayor_ingreso
+            kpis['mayor_cat_ingreso_monto'] = ingresos_por_cat[mayor_ingreso]
+            kpis['mayor_cat_ingreso_pct'] = (ingresos_por_cat[mayor_ingreso] / self.metricas['total_ingresos'] * 100) if self.metricas['total_ingresos'] > 0 else 0
+        else:
+            kpis['mayor_cat_ingreso_nombre'] = 'N/A'
+            kpis['mayor_cat_ingreso_monto'] = 0
+            kpis['mayor_cat_ingreso_pct'] = 0
+
+        return kpis
+
+    def _calcular_resumen_categorias(self) -> str:
+        """
+        Calcula resumen por Categoria_Principal para tabla.
+
+        Returns:
+            String JSON con datos de la tabla
+        """
+        # Agrupar por Categoria_Principal
+        resumen = []
+
+        for cat_principal in self.df['Categoria_Principal'].unique():
+            if cat_principal == 'Sin Clasificar':
+                continue
+
+            df_cat = self.df[self.df['Categoria_Principal'] == cat_principal]
+
+            transacciones = len(df_cat)
+            ingresos = df_cat[df_cat['Tipo_Movimiento'] == 'Ingreso']['Crédito'].sum()
+            egresos = df_cat[df_cat['Tipo_Movimiento'] == 'Egreso']['Débito'].sum()
+            neto = ingresos - egresos
+
+            resumen.append({
+                'categoria': cat_principal,
+                'transacciones': transacciones,
+                'ingresos': ingresos,
+                'egresos': egresos,
+                'neto': neto
+            })
+
+        # Ordenar por egresos descendente
+        resumen.sort(key=lambda x: x['egresos'], reverse=True)
+
+        return json.dumps(resumen)
 
     def _preparar_datos_torta(self, datos: Dict) -> str:
         """

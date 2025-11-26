@@ -27,6 +27,7 @@ os.makedirs(CARPETA_DIST, exist_ok=True)
 os.makedirs(os.path.join(CARPETA_DIST, NOMBRE_PAQUETE), exist_ok=True)
 os.makedirs(os.path.join(CARPETA_DIST, NOMBRE_PAQUETE, 'input'), exist_ok=True)
 os.makedirs(os.path.join(CARPETA_DIST, NOMBRE_PAQUETE, 'output'), exist_ok=True)
+os.makedirs(os.path.join(CARPETA_DIST, NOMBRE_PAQUETE, 'manuales'), exist_ok=True)
 
 # 3. Copiar ejecutable
 print(f"\n📦 Copiando ejecutable...")
@@ -55,8 +56,8 @@ if os.path.exists('INICIAR_TORO.bat'):
     shutil.copy2('INICIAR_TORO.bat', os.path.join(CARPETA_DIST, NOMBRE_PAQUETE, 'INICIAR_TORO.bat'))
     print(f"   ✅ Copiado: INICIAR_TORO.bat")
 
-# 4. Copiar documentación
-print(f"\n📄 Copiando documentación...")
+# 4. Copiar documentación a carpeta manuales/
+print(f"\n📄 Copiando documentación a manuales/...")
 archivos_doc = [
     ('LEEME_USUARIOS.txt', 'LEEME.txt'),
     ('MANUAL_SISTEMA_SANARTE.md', 'MANUAL.md'),
@@ -65,8 +66,8 @@ archivos_doc = [
 
 for origen, destino in archivos_doc:
     if os.path.exists(origen):
-        shutil.copy2(origen, os.path.join(CARPETA_DIST, NOMBRE_PAQUETE, destino))
-        print(f"   ✅ Copiado: {origen} → {destino}")
+        shutil.copy2(origen, os.path.join(CARPETA_DIST, NOMBRE_PAQUETE, 'manuales', destino))
+        print(f"   ✅ Copiado: {origen} → manuales/{destino}")
 
 # 5. Copiar archivos de ejemplo (si existen)
 if os.path.exists('data'):
@@ -98,13 +99,15 @@ inicio_rapido = f"""
 📂 ESTRUCTURA DE CARPETAS:
 
     TORO_v{VERSION}/
-    ├── TORO{'     ' if os.name != 'nt' else '.exe'}      ← Ejecutable principal
+    ├── INICIAR_TORO.bat      ← Ejecutar este archivo
+    ├── TORO/                 ← Carpeta con ejecutable
     ├── input/                ← Poner aquí los archivos Excel
     ├── output/               ← Aquí aparecen los reportes
     ├── ejemplos/             ← Archivos de ejemplo (opcional)
-    ├── INICIO_RAPIDO.txt     ← Este archivo
-    ├── LEEME.txt             ← Instrucciones completas
-    └── MANUAL.md             ← Manual técnico completo
+    └── manuales/             ← Documentación
+        ├── INICIO_RAPIDO.txt ← Este archivo
+        ├── LEEME.txt         ← Instrucciones completas
+        └── MANUAL.md         ← Manual técnico completo
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -129,7 +132,7 @@ No hay archivos en input/:
 
 El programa no abre:
    → Verifica tener permisos de ejecución
-   → Consulta LEEME.txt para más detalles
+   → Consulta manuales/LEEME.txt para más detalles
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -143,9 +146,9 @@ Para reportar problemas o sugerencias:
                               ¡Gracias por usar TORO! 🐂
 """
 
-with open(os.path.join(CARPETA_DIST, NOMBRE_PAQUETE, 'INICIO_RAPIDO.txt'), 'w', encoding='utf-8') as f:
+with open(os.path.join(CARPETA_DIST, NOMBRE_PAQUETE, 'manuales', 'INICIO_RAPIDO.txt'), 'w', encoding='utf-8') as f:
     f.write(inicio_rapido)
-print("   ✅ Creado: INICIO_RAPIDO.txt")
+print("   ✅ Creado: manuales/INICIO_RAPIDO.txt")
 
 # 7. Crear archivo ZIP
 print(f"\n📦 Comprimiendo paquete...")

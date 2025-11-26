@@ -22,16 +22,21 @@ print(f"GENERANDO EJECUTABLE {APP_NAME} v{VERSION}")
 print("="*80)
 
 # Comando PyInstaller
+# Determinar separador según OS (: en Linux/Mac, ; en Windows)
+separador = ':' if os.name != 'nt' else ';'
+
 comando = [
     'pyinstaller',
     '--name', APP_NAME,
     '--onefile',                    # Un solo .exe
-    '--windowed',                   # Sin consola negra (opcional)
-    '--add-data', 'src;src',        # Incluir carpeta src
+    '--console',                    # Con consola (cambiado de --windowed)
+    '--add-data', f'src{separador}src',  # Incluir carpeta src
     '--hidden-import', 'pandas',
     '--hidden-import', 'openpyxl',
     '--hidden-import', 'datetime',
+    '--hidden-import', 'rich',
     '--collect-all', 'openpyxl',
+    '--collect-all', 'rich',
     '--noconfirm',                  # Sobrescribir sin preguntar
 ]
 
@@ -52,12 +57,22 @@ if resultado.returncode == 0:
     print("\n" + "="*80)
     print("✅ EJECUTABLE GENERADO EXITOSAMENTE")
     print("="*80)
-    print(f"\nUbicación: dist/{APP_NAME}.exe")
-    print(f"Tamaño: {os.path.getsize(f'dist/{APP_NAME}.exe') / (1024*1024):.1f} MB")
+
+    # Nombre del ejecutable depende del SO
+    exe_ext = '.exe' if os.name == 'nt' else ''
+    exe_path = f'dist/{APP_NAME}{exe_ext}'
+
+    if os.path.exists(exe_path):
+        print(f"\nUbicación: {exe_path}")
+        print(f"Tamaño: {os.path.getsize(exe_path) / (1024*1024):.1f} MB")
+    else:
+        print(f"\nUbicación: dist/{APP_NAME}")
+        print(f"Tamaño: {os.path.getsize(f'dist/{APP_NAME}') / (1024*1024):.1f} MB")
+
     print("\nPara distribuir:")
-    print(f"  1. Copiar dist/{APP_NAME}.exe")
-    print("  2. Copiar carpetas 'input/' y 'output/' junto al .exe")
-    print("  3. Listo para usar en cualquier PC Windows")
+    print(f"  1. Copiar el ejecutable desde dist/")
+    print("  2. Copiar carpetas 'input/' y 'output/' junto al ejecutable")
+    print("  3. Listo para usar en cualquier PC")
 else:
     print("\n❌ ERROR al generar ejecutable")
     print(f"Código de salida: {resultado.returncode}")

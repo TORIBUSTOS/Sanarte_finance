@@ -1,5 +1,5 @@
 """
-Script de build para generar ejecutable SANARTE.exe
+Script de build para generar ejecutable TORO.exe
 Ejecutar: python build_exe.py
 """
 import os
@@ -7,9 +7,9 @@ import subprocess
 import shutil
 
 # Configuración
-APP_NAME = "SANARTE"
+APP_NAME = "TORO"
 VERSION = "1.3"
-ICON = "sanarte_icon.ico"  # Opcional: agregar icono personalizado
+ICON = "toro_icon.ico"  # Opcional: agregar icono personalizado
 
 # Limpiar builds anteriores
 if os.path.exists('build'):

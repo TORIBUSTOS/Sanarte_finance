@@ -1,5 +1,5 @@
 """
-Script para preparar paquete de distribución de SANARTE
+Script para preparar paquete de distribución de TORO
 Crea una carpeta lista para compartir con todo lo necesario
 """
 import os
@@ -9,11 +9,11 @@ from datetime import datetime
 
 # Configuración
 VERSION = "1.3"
-NOMBRE_PAQUETE = f"SANARTE_v{VERSION}"
+NOMBRE_PAQUETE = f"TORO_v{VERSION}"
 CARPETA_DIST = "paquete_distribucion"
 
 print("="*80)
-print(f"PREPARANDO PAQUETE DE DISTRIBUCIÓN - SANARTE v{VERSION}")
+print(f"🐂 PREPARANDO PAQUETE DE DISTRIBUCIÓN - TORO v{VERSION}")
 print("="*80)
 
 # 1. Limpiar carpeta de distribución anterior
@@ -30,9 +30,9 @@ os.makedirs(os.path.join(CARPETA_DIST, NOMBRE_PAQUETE, 'output'), exist_ok=True)
 
 # 3. Copiar ejecutable
 print(f"\n📦 Copiando ejecutable...")
-ejecutable_origen = 'dist/SANARTE'
+ejecutable_origen = 'dist/TORO'
 if os.name == 'nt':  # Windows
-    ejecutable_origen = 'dist/SANARTE.exe'
+    ejecutable_origen = 'dist/TORO.exe'
 
 if os.path.exists(ejecutable_origen):
     ejecutable_destino = os.path.join(CARPETA_DIST, NOMBRE_PAQUETE, os.path.basename(ejecutable_origen))
@@ -66,7 +66,7 @@ if os.path.exists('data'):
 print(f"\n📝 Creando INICIO_RAPIDO.txt...")
 inicio_rapido = f"""
 ╔═══════════════════════════════════════════════════════════════════════════════╗
-║                    SANARTE - Sistema de Control Financiero                    ║
+║                      TORO - Sistema de Control Financiero                     ║
 ║                              Versión {VERSION} - {datetime.now().year}                               ║
 ╚═══════════════════════════════════════════════════════════════════════════════╝
 
@@ -74,7 +74,7 @@ inicio_rapido = f"""
 
 1️⃣  Copiar tu extracto bancario Excel (.xlsx) a la carpeta "input/"
 
-2️⃣  Doble clic en el ejecutable SANARTE{'  (o ./SANARTE en Linux)' if os.name != 'nt' else '.exe'}
+2️⃣  Doble clic en el ejecutable TORO{'  (o ./TORO en Linux)' if os.name != 'nt' else '.exe'}
 
 3️⃣  Seguir las instrucciones del menú:
     → Opción 1: Procesar archivo
@@ -84,8 +84,8 @@ inicio_rapido = f"""
 
 📂 ESTRUCTURA DE CARPETAS:
 
-    SANARTE_v{VERSION}/
-    ├── SANARTE{'     ' if os.name != 'nt' else '.exe'}      ← Ejecutable principal
+    TORO_v{VERSION}/
+    ├── TORO{'     ' if os.name != 'nt' else '.exe'}      ← Ejecutable principal
     ├── input/                ← Poner aquí los archivos Excel
     ├── output/               ← Aquí aparecen los reportes
     ├── ejemplos/             ← Archivos de ejemplo (opcional)
@@ -108,7 +108,7 @@ inicio_rapido = f"""
 {"   → Clic en 'Más información'" if os.name == 'nt' else ""}
 {"   → Clic en 'Ejecutar de todas formas'" if os.name == 'nt' else ""}
 {"" if os.name == 'nt' else "Permiso denegado en Linux:"}
-{"" if os.name == 'nt' else "   → chmod +x SANARTE"}
+{"" if os.name == 'nt' else "   → chmod +x TORO"}
 
 No hay archivos en input/:
    → Verifica que el archivo sea .xlsx (no .xls)
@@ -127,7 +127,7 @@ Para reportar problemas o sugerencias:
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-                            ¡Gracias por usar SANARTE! 🐂
+                              ¡Gracias por usar TORO! 🐂
 """
 
 with open(os.path.join(CARPETA_DIST, NOMBRE_PAQUETE, 'INICIO_RAPIDO.txt'), 'w', encoding='utf-8') as f:

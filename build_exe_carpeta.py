@@ -1,5 +1,5 @@
 """
-Script de build alternativo para SANARTE - Modo carpeta (más estable)
+Script de build alternativo para TORO - Modo carpeta (más estable)
 Genera una carpeta con el ejecutable y dependencias (sin problemas de stdin)
 Ejecutar: python build_exe_carpeta.py
 """
@@ -8,9 +8,9 @@ import subprocess
 import shutil
 
 # Configuración
-APP_NAME = "SANARTE"
+APP_NAME = "TORO"
 VERSION = "1.3"
-ICON = "sanarte_icon.ico"
+ICON = "toro_icon.ico"
 
 # Limpiar builds anteriores
 if os.path.exists('build'):
@@ -19,7 +19,7 @@ if os.path.exists('dist'):
     shutil.rmtree('dist')
 
 print("="*80)
-print(f"GENERANDO EJECUTABLE {APP_NAME} v{VERSION} (MODO CARPETA)")
+print(f"🐂 GENERANDO EJECUTABLE {APP_NAME} v{VERSION} (MODO CARPETA)")
 print("="*80)
 print("\nEste método genera una carpeta con el .exe y sus dependencias.")
 print("Es más estable y evita problemas con entrada de teclado.\n")

@@ -1,5 +1,5 @@
 """
-Launcher para SANARTE - Maneja problemas de stdin con PyInstaller
+Launcher para TORO - Maneja problemas de stdin con PyInstaller
 Este archivo soluciona el problema de "lost sys.stdin" en ejecutables
 """
 import sys

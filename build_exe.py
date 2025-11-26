@@ -29,15 +29,20 @@ comando = [
     'pyinstaller',
     '--name', APP_NAME,
     '--onefile',                    # Un solo .exe
-    '--console',                    # Con consola (cambiado de --windowed)
+    '--console',                    # Con consola
     '--add-data', f'src{separador}src',  # Incluir carpeta src
     '--hidden-import', 'pandas',
     '--hidden-import', 'openpyxl',
     '--hidden-import', 'datetime',
     '--hidden-import', 'rich',
+    '--hidden-import', 'rich.console',
+    '--hidden-import', 'rich.prompt',
+    '--hidden-import', 'rich.table',
+    '--hidden-import', 'rich.panel',
     '--collect-all', 'openpyxl',
     '--collect-all', 'rich',
     '--noconfirm',                  # Sobrescribir sin preguntar
+    '--noupx',                      # Desactivar UPX (puede causar problemas)
 ]
 
 # Agregar icono si existe

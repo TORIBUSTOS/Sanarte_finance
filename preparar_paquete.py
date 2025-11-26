@@ -30,17 +30,30 @@ os.makedirs(os.path.join(CARPETA_DIST, NOMBRE_PAQUETE, 'output'), exist_ok=True)
 
 # 3. Copiar ejecutable
 print(f"\n📦 Copiando ejecutable...")
-ejecutable_origen = 'dist/TORO'
-if os.name == 'nt':  # Windows
-    ejecutable_origen = 'dist/TORO.exe'
 
-if os.path.exists(ejecutable_origen):
-    ejecutable_destino = os.path.join(CARPETA_DIST, NOMBRE_PAQUETE, os.path.basename(ejecutable_origen))
-    shutil.copy2(ejecutable_origen, ejecutable_destino)
-    print(f"   ✅ Copiado: {ejecutable_origen}")
+# Modo carpeta: dist/TORO/ (carpeta completa)
+if os.path.exists('dist/TORO') and os.path.isdir('dist/TORO'):
+    carpeta_destino = os.path.join(CARPETA_DIST, NOMBRE_PAQUETE, 'TORO')
+    shutil.copytree('dist/TORO', carpeta_destino)
+    print(f"   ✅ Copiada carpeta: dist/TORO/ → TORO/")
+# Modo archivo único: dist/TORO.exe o dist/TORO
 else:
-    print(f"   ⚠️  ADVERTENCIA: No se encontró {ejecutable_origen}")
-    print("   Primero ejecuta: python build_exe.py")
+    ejecutable_origen = 'dist/TORO'
+    if os.name == 'nt':  # Windows
+        ejecutable_origen = 'dist/TORO.exe'
+
+    if os.path.exists(ejecutable_origen):
+        ejecutable_destino = os.path.join(CARPETA_DIST, NOMBRE_PAQUETE, os.path.basename(ejecutable_origen))
+        shutil.copy2(ejecutable_origen, ejecutable_destino)
+        print(f"   ✅ Copiado: {ejecutable_origen}")
+    else:
+        print(f"   ⚠️  ADVERTENCIA: No se encontró {ejecutable_origen}")
+        print("   Primero ejecuta: python build_exe_carpeta.py o python build_exe.py")
+
+# 3b. Copiar launcher .bat (si existe)
+if os.path.exists('INICIAR_TORO.bat'):
+    shutil.copy2('INICIAR_TORO.bat', os.path.join(CARPETA_DIST, NOMBRE_PAQUETE, 'INICIAR_TORO.bat'))
+    print(f"   ✅ Copiado: INICIAR_TORO.bat")
 
 # 4. Copiar documentación
 print(f"\n📄 Copiando documentación...")

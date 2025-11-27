@@ -1,8 +1,8 @@
 """
-Sistema de Control Financiero SANARTE
+Sistema de Control Financiero TORO
 Script principal - Bloques 1 y 2
 
-Autor: Sistema SANARTE
+Autor: Sistema TORO
 Versión: 1.1 - Bloques 1 y 2
 """
 import os
@@ -65,7 +65,7 @@ def consolidar_bancos(ruta_input: str = "./input", ruta_output: str = "./output"
         archivo_especifico: Nombre de archivo específico a procesar (opcional)
     """
     print("="*80)
-    print("SANARTE - Sistema de Control Financiero")
+    print("TORO · Resumen de Cuentas - Sistema de Control Financiero")
     print("Bloque 1: Consolidador Multi-Banco")
     print("="*80)
 
@@ -174,7 +174,7 @@ def categorizar_movimientos(ruta_archivo_consolidado: str = None,
     import pandas as pd
 
     print("="*80)
-    print("SANARTE - Sistema de Control Financiero")
+    print("TORO · Resumen de Cuentas - Sistema de Control Financiero")
     print("Bloque 2: Categorizador Inteligente")
     print("="*80)
 
@@ -271,7 +271,7 @@ def generar_reportes(ruta_archivo_categorizado: str = None,
     import webbrowser
 
     print("="*80)
-    print("SANARTE - Sistema de Control Financiero")
+    print("TORO · Resumen de Cuentas - Sistema de Control Financiero")
     print("Bloque 3: Reportes y Dashboard")
     print("="*80)
 
@@ -345,7 +345,7 @@ def main():
     Punto de entrada principal del sistema.
     """
     parser = argparse.ArgumentParser(
-        description="Sistema SANARTE - Control Financiero",
+        description="Sistema TORO · Resumen de Cuentas - Control Financiero",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Ejemplos de uso:

@@ -36,3 +36,7 @@ credentials.json
 output/*.xlsx
 output/*.html
 output/*.pdf
+
+# Paquetes de distribución
+paquete_distribucion/
+*.zip

@@ -70,9 +70,17 @@ class DashboardGenerator:
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SANARTE - Dashboard Financiero</title>
+    <title>TORO · Resumen de Cuentas – Dashboard Financiero</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
+        /*
+        TORO Color Palette:
+        --toro-verde: #059669 (verde petróleo - color principal)
+        --toro-verde-oscuro: #047857 (verde oscuro)
+        --toro-acento: #0ea5e9 (azul acento)
+        --toro-verde-claro: #10b981 (verde claro para destacados)
+        */
+
         * {{
             margin: 0;
             padding: 0;
@@ -81,7 +89,7 @@ class DashboardGenerator:
 
         body {{
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
             padding: 20px;
             min-height: 100vh;
         }}
@@ -96,7 +104,7 @@ class DashboardGenerator:
         }}
 
         .header {{
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #059669 0%, #0ea5e9 100%);
             color: white;
             padding: 30px;
             text-align: center;
@@ -144,23 +152,23 @@ class DashboardGenerator:
         }}
 
         .card.clasificados {{
-            border-color: #007bff;
+            border-color: #0ea5e9;
         }}
 
         .card.saldo-inicial {{
-            border-color: #6f42c1;
+            border-color: #059669;
         }}
 
         .card.saldo-final {{
-            border-color: #17a2b8;
+            border-color: #0ea5e9;
         }}
 
         .card.debin {{
-            border-color: #28a745;
+            border-color: #10b981;
         }}
 
         .card.prestadores {{
-            border-color: #e83e8c;
+            border-color: #059669;
         }}
 
         .card.mayor-egreso {{
@@ -168,7 +176,7 @@ class DashboardGenerator:
         }}
 
         .card.mayor-ingreso {{
-            border-color: #20c997;
+            border-color: #10b981;
         }}
 
         .card-title {{
@@ -198,23 +206,23 @@ class DashboardGenerator:
         }}
 
         .card.clasificados .card-value {{
-            color: #007bff;
+            color: #0ea5e9;
         }}
 
         .card.saldo-inicial .card-value {{
-            color: #6f42c1;
+            color: #059669;
         }}
 
         .card.saldo-final .card-value {{
-            color: #17a2b8;
+            color: #0ea5e9;
         }}
 
         .card.debin .card-value {{
-            color: #28a745;
+            color: #10b981;
         }}
 
         .card.prestadores .card-value {{
-            color: #e83e8c;
+            color: #059669;
         }}
 
         .card.mayor-egreso .card-value {{
@@ -222,7 +230,7 @@ class DashboardGenerator:
         }}
 
         .card.mayor-ingreso .card-value {{
-            color: #20c997;
+            color: #10b981;
         }}
 
         .card-subtitle {{
@@ -310,7 +318,7 @@ class DashboardGenerator:
         }}
 
         .summary-table th {{
-            background: #667eea;
+            background: #059669;
             color: white;
             padding: 12px;
             text-align: right;
@@ -363,7 +371,7 @@ class DashboardGenerator:
 <body>
     <div class="container">
         <div class="header">
-            <h1>SANARTE - Dashboard Financiero</h1>
+            <h1>TORO · Resumen de Cuentas</h1>
             <p>Generado el {fecha_generacion}</p>
         </div>
 
@@ -477,7 +485,7 @@ class DashboardGenerator:
         </div>
 
         <div class="footer">
-            &copy; 2025 SANARTE - Sistema de Control Financiero | Generado automáticamente
+            &copy; 2025 TORO · Resumen de Cuentas | Generado automáticamente
         </div>
     </div>
 
@@ -511,11 +519,11 @@ class DashboardGenerator:
                 datasets: [{{
                     data: datosIngresos.values,
                     backgroundColor: [
-                        '#28a745',
-                        '#20c997',
-                        '#17a2b8',
-                        '#6610f2',
-                        '#e83e8c'
+                        '#059669',  // TORO verde petróleo
+                        '#10b981',  // TORO verde claro
+                        '#0ea5e9',  // TORO azul acento
+                        '#047857',  // TORO verde oscuro
+                        '#06b6d4'   // Cyan complementario
                     ],
                     borderWidth: 2,
                     borderColor: '#fff'
@@ -597,8 +605,8 @@ class DashboardGenerator:
                     {{
                         label: 'Ingresos',
                         data: datosFlujo.ingresos,
-                        borderColor: '#28a745',
-                        backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                        borderColor: '#059669',
+                        backgroundColor: 'rgba(5, 150, 105, 0.1)',
                         tension: 0.4,
                         fill: true
                     }},

@@ -16,6 +16,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 from main import consolidar_bancos, categorizar_movimientos, generar_reportes
+from config import get_config
 from glob import glob
 
 # Rich imports para interfaz mejorada
@@ -36,10 +37,11 @@ def seleccionar_archivo_input():
     Returns:
         str: Nombre del archivo seleccionado o None si no hay archivos o se cancela
     """
-    archivos = glob(os.path.join('./input', '*.xlsx'))
+    config = get_config()
+    archivos = glob(os.path.join(config.paths.input_dir, '*.xlsx'))
 
     if not archivos:
-        console.print("\n[bold red]❌ ERROR:[/bold red] No hay archivos Excel (.xlsx) en la carpeta './input'")
+        console.print(f"\n[bold red]❌ ERROR:[/bold red] No hay archivos Excel (.xlsx) en la carpeta '{config.paths.input_dir}'")
         console.print("[yellow]Por favor, coloca los extractos bancarios en esa carpeta.[/yellow]")
         return None
 

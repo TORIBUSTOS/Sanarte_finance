@@ -3,13 +3,16 @@ Sistema de Control Financiero TORO
 Script principal - Bloques 1 y 2
 
 Autor: Sistema TORO
-Versión: 1.1 - Bloques 1 y 2
+Versión: 1.2 - Bloques 1 y 2
 """
 import os
 import sys
 import argparse
 from glob import glob
 from datetime import datetime
+
+# Importar configuración centralizada
+from config import get_config
 
 # Importar módulos propios
 from readers.supervielle_reader import SupervielleReader
@@ -55,15 +58,20 @@ def detectar_banco(ruta_archivo: str):
         return None, None
 
 
-def consolidar_bancos(ruta_input: str = "./input", ruta_output: str = "./output", archivo_especifico: str = None):
+def consolidar_bancos(ruta_input: str = None, ruta_output: str = None, archivo_especifico: str = None):
     """
     Proceso completo de consolidación de extractos bancarios.
 
     Args:
-        ruta_input: Carpeta donde están los archivos Excel
-        ruta_output: Carpeta donde se guardarán los resultados
+        ruta_input: Carpeta donde están los archivos Excel (default: config.paths.input_dir)
+        ruta_output: Carpeta donde se guardarán los resultados (default: config.paths.output_dir)
         archivo_especifico: Nombre de archivo específico a procesar (opcional)
     """
+    # Obtener configuración
+    config = get_config()
+    ruta_input = ruta_input or config.paths.input_dir
+    ruta_output = ruta_output or config.paths.output_dir
+
     print("="*80)
     print("TORO · Resumen de Cuentas - Sistema de Control Financiero")
     print("Bloque 1: Consolidador Multi-Banco")
@@ -161,17 +169,21 @@ def consolidar_bancos(ruta_input: str = "./input", ruta_output: str = "./output"
 
 
 def categorizar_movimientos(ruta_archivo_consolidado: str = None,
-                            ruta_output: str = "./output",
+                            ruta_output: str = None,
                             revisar_manual: bool = True):
     """
     Categoriza movimientos consolidados.
 
     Args:
         ruta_archivo_consolidado: Ruta al archivo consolidado (si None, busca el más reciente)
-        ruta_output: Carpeta de salida
+        ruta_output: Carpeta de salida (default: config.paths.output_dir)
         revisar_manual: Si True, abre CLI para corrección de movimientos sin clasificar
     """
     import pandas as pd
+
+    # Obtener configuración
+    config = get_config()
+    ruta_output = ruta_output or config.paths.output_dir
 
     print("="*80)
     print("TORO · Resumen de Cuentas - Sistema de Control Financiero")
@@ -257,18 +269,22 @@ def categorizar_movimientos(ruta_archivo_consolidado: str = None,
 
 
 def generar_reportes(ruta_archivo_categorizado: str = None,
-                     ruta_output: str = "./output",
+                     ruta_output: str = None,
                      abrir_dashboard: bool = True):
     """
     Genera reportes y dashboard desde movimientos categorizados.
 
     Args:
         ruta_archivo_categorizado: Ruta al archivo categorizado (si None, busca el más reciente)
-        ruta_output: Carpeta de salida
+        ruta_output: Carpeta de salida (default: config.paths.output_dir)
         abrir_dashboard: Si True, intenta abrir el dashboard en el navegador
     """
     import pandas as pd
     import webbrowser
+
+    # Obtener configuración
+    config = get_config()
+    ruta_output = ruta_output or config.paths.output_dir
 
     print("="*80)
     print("TORO · Resumen de Cuentas - Sistema de Control Financiero")
@@ -407,18 +423,21 @@ Para más información, consulta el README.md
         help='No abrir dashboard en navegador (solo para --reportes)'
     )
 
+    # Obtener configuración para defaults
+    config = get_config()
+
     parser.add_argument(
         '--input',
         type=str,
-        default='./input',
-        help='Carpeta con archivos Excel de entrada (default: ./input)'
+        default=config.paths.input_dir,
+        help=f'Carpeta con archivos Excel de entrada (default: {config.paths.input_dir})'
     )
 
     parser.add_argument(
         '--output',
         type=str,
-        default='./output',
-        help='Carpeta para archivos de salida (default: ./output)'
+        default=config.paths.output_dir,
+        help=f'Carpeta para archivos de salida (default: {config.paths.output_dir})'
     )
 
     args = parser.parse_args()

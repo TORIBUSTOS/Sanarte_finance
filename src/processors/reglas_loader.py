@@ -20,13 +20,19 @@ class ReglasLoader:
     - Reglas de Nivel 2 (Refinamiento) desde data/reglas_refinamiento.json
     """
 
-    def __init__(self, ruta_base: str = "./data"):
+    def __init__(self, ruta_base: str = None):
         """
         Inicializa el cargador de reglas.
 
         Args:
-            ruta_base: Ruta base donde están los archivos JSON
+            ruta_base: Ruta base donde están los archivos JSON (default: config.paths.data_dir)
         """
+        # Usar configuración centralizada si no se especifica ruta
+        if ruta_base is None:
+            from config import get_config
+            config = get_config()
+            ruta_base = config.paths.data_dir
+
         self.ruta_base = ruta_base
         self.ruta_concepto = os.path.join(ruta_base, "reglas_concepto.json")
         self.ruta_refinamiento = os.path.join(ruta_base, "reglas_refinamiento.json")
@@ -171,12 +177,12 @@ class ReglasLoader:
 
 
 # Función de conveniencia para uso directo
-def cargar_reglas_desde_json(ruta_base: str = "./data") -> Tuple[Dict, Dict]:
+def cargar_reglas_desde_json(ruta_base: str = None) -> Tuple[Dict, Dict]:
     """
     Carga todas las reglas desde archivos JSON.
 
     Args:
-        ruta_base: Ruta base donde están los JSON
+        ruta_base: Ruta base donde están los JSON (default: config.paths.data_dir)
 
     Returns:
         Tupla (reglas_concepto, reglas_refinamiento)

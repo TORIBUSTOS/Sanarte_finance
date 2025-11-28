@@ -1,6 +1,6 @@
 """
-Consolidador de movimientos multi-banco
-Autor: Sistema SANARTE
+Consolidador de movimientos multi-banco - TORO · Resumen de Cuentas
+Autor: Sistema TORO
 """
 import pandas as pd
 from datetime import datetime
@@ -15,7 +15,13 @@ class Consolidator:
     - Exporta a Excel
     """
 
-    def __init__(self, ruta_output: str = "./output"):
+    def __init__(self, ruta_output: str = None):
+        # Usar configuración centralizada si no se especifica ruta
+        if ruta_output is None:
+            from config import get_config
+            config = get_config()
+            ruta_output = config.paths.output_dir
+
         self.ruta_output = ruta_output
 
         # Crear carpeta output si no existe

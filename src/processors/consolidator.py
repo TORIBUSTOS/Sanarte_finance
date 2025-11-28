@@ -2,10 +2,11 @@
 Consolidador de movimientos multi-banco - TORO · Resumen de Cuentas
 Autor: Sistema TORO
 """
-import pandas as pd
-from datetime import datetime
 import os
+from datetime import datetime
 from typing import List
+
+import pandas as pd
 
 class Consolidator:
     """

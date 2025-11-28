@@ -1,6 +1,6 @@
 """
-Normalizador de datos financieros
-Autor: Sistema SANARTE
+Normalizador de datos financieros - TORO · Resumen de Cuentas
+Autor: Sistema TORO
 """
 import pandas as pd
 from datetime import datetime

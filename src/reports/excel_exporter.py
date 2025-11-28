@@ -1,6 +1,6 @@
 """
-Exportador de reportes ejecutivos a Excel
-Autor: Sistema SANARTE
+Exportador de reportes ejecutivos a Excel - TORO · Resumen de Cuentas
+Autor: Sistema TORO
 """
 import pandas as pd
 from openpyxl import load_workbook

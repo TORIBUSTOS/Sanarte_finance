@@ -1,6 +1,6 @@
 """
-Generador de dashboard HTML interactivo
-Autor: Sistema SANARTE
+Generador de dashboard HTML interactivo - TORO · Resumen de Cuentas
+Autor: Sistema TORO
 """
 import pandas as pd
 import json

@@ -168,6 +168,41 @@ def consolidar_bancos(ruta_input: str = None, ruta_output: str = None, archivo_e
     return df_consolidado, archivo_salida
 
 
+def categorizar_movimientos_df(df, categorizer=None):
+    """
+    Lógica pura: categoriza un DataFrame de movimientos.
+
+    Sin efectos secundarios: no hace prints, no lee archivos, no pide input.
+    Función testeable que solo realiza transformación de datos.
+
+    Args:
+        df: DataFrame con movimientos consolidados (pandas.DataFrame)
+        categorizer: Instancia de Categorizer (opcional, crea uno si None)
+
+    Returns:
+        Tupla (df_categorizado, df_sin_clasificar)
+        - df_categorizado: DataFrame con todas las categorías asignadas
+        - df_sin_clasificar: DataFrame solo con movimientos sin clasificar
+
+    Ejemplo:
+        >>> import pandas as pd
+        >>> df = pd.DataFrame({'Concepto': ['transferencia'], 'Detalle': ['pago']})
+        >>> df_cat, df_sin_cat = categorizar_movimientos_df(df)
+        >>> len(df_cat)  # Retorna DataFrame categorizado
+    """
+    import pandas as pd
+
+    # Crear categorizador si no se provee uno
+    if categorizer is None:
+        categorizer = Categorizer()
+
+    # Lógica pura de negocio (sin prints ni inputs)
+    df_categorizado = categorizer.categorizar_dataframe(df)
+    df_sin_clasificar = categorizer.obtener_sin_clasificar(df_categorizado)
+
+    return df_categorizado, df_sin_clasificar
+
+
 def categorizar_movimientos(ruta_archivo_consolidado: str = None,
                             ruta_output: str = None,
                             revisar_manual: bool = True):
@@ -215,11 +250,8 @@ def categorizar_movimientos(ruta_archivo_consolidado: str = None,
     # Crear categorizador
     categorizer = Categorizer()
 
-    # Categorizar
-    df_categorizado = categorizer.categorizar_dataframe(df)
-
-    # Obtener movimientos sin clasificar
-    df_sin_clasificar = categorizer.obtener_sin_clasificar(df_categorizado)
+    # Llamar a la función pura de categorización (lógica de negocio separada)
+    df_categorizado, df_sin_clasificar = categorizar_movimientos_df(df, categorizer)
 
     # Revisión manual si hay movimientos sin clasificar y se solicita
     if len(df_sin_clasificar) > 0 and revisar_manual:

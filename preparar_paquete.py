@@ -8,7 +8,7 @@ import zipfile
 from datetime import datetime
 
 # Configuración
-VERSION = "1.3"
+VERSION = "2.0.0"
 NOMBRE_PAQUETE = f"TORO_v{VERSION}"
 CARPETA_DIST = "paquete_distribucion"
 

@@ -1,0 +1,16 @@
+# Dependencias de desarrollo - TORO v2.0.0
+# Para instalar: pip install -r requirements-dev.txt
+
+# Dependencias de producción
+-r requirements.txt
+
+# Testing
+pytest>=9.0.0
+pytest-cov>=7.0.0
+
+# Empaquetado
+pyinstaller>=6.0.0
+
+# Formateo y linting (opcional)
+black>=24.0.0
+flake8>=7.0.0

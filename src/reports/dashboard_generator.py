@@ -843,10 +843,10 @@ class DashboardGenerator:
 
             resumen.append({
                 'categoria': cat_principal,
-                'transacciones': transacciones,
-                'ingresos': ingresos,
-                'egresos': egresos,
-                'neto': neto
+                'transacciones': int(transacciones),
+                'ingresos': float(ingresos),
+                'egresos': float(egresos),
+                'neto': float(neto)
             })
 
         # Ordenar por egresos descendente

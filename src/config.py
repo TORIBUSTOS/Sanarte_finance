@@ -5,7 +5,7 @@ Configuración Centralizada - TORO · Resumen de Cuentas
 Gestión unificada de rutas, configuraciones y constantes del sistema.
 
 Sistema: TORO (anteriormente SANARTE)
-Versión: 1.2
+Versión: 2.0.0
 """
 import os
 from dataclasses import dataclass
@@ -73,7 +73,7 @@ class SystemConfig:
         autor: Autor del sistema
     """
     app_name: str = "TORO · Resumen de Cuentas"
-    version: str = "1.2"
+    version: str = "2.0.0"
     autor: str = "Sistema TORO"
 
 

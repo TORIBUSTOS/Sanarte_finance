@@ -1,10 +1,11 @@
 """
-Analizador financiero de movimientos categorizados
-Autor: Sistema SANARTE
+Analizador financiero de movimientos categorizados - TORO · Resumen de Cuentas
+Autor: Sistema TORO
 """
-import pandas as pd
-from typing import Dict, List, Tuple
 from datetime import datetime
+from typing import Dict, List, Tuple
+
+import pandas as pd
 
 class Analyzer:
     """
@@ -34,7 +35,7 @@ class Analyzer:
         Returns:
             Diccionario con todas las métricas
         """
-        print("\nCalculando metricas financieras...")
+        print("\nCalculando métricas financieras...")
 
         # Filtrar movimientos clasificados vs sin clasificar
         df_clasificados = self.df[self.df['Categoria_Principal'] != 'Sin Clasificar']
@@ -308,11 +309,11 @@ class Analyzer:
         else:
             print(f"Saldo Final:     ${self.metricas['saldo_final']:,.2f}")
 
-        print(f"Variacion:       ${self.metricas['variacion']:,.2f}")
+        print(f"Variación:       ${self.metricas['variacion']:,.2f}")
 
         # Validación de coherencia
         if not self.metricas['validacion_saldos_ok']:
-            print(f"\nADVERTENCIA: Diferencia en validacion de saldos: ${self.metricas['diferencia_validacion']:,.2f}")
+            print(f"\nADVERTENCIA: Diferencia en validación de saldos: ${self.metricas['diferencia_validacion']:,.2f}")
             print("El saldo final no coincide con: Saldo Inicial + Ingresos - Egresos")
 
         if self.metricas['alerta_egresos_mayores']:

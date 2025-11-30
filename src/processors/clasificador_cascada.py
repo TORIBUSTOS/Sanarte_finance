@@ -1,7 +1,24 @@
 """
-Motor de clasificación en cascada de 2 niveles
-Autor: Sistema SANARTE
-Versión: 2.0 - Clasificación por Concepto + Refinamiento por Detalle
+Motor de Clasificación Oficial - TORO · Resumen de Cuentas
+===========================================================
+
+Sistema: TORO (anteriormente SANARTE)
+Motor: ClasificadorCascada
+Versión: 2.0
+Estado: OFICIAL - Motor en producción
+
+Descripción:
+-----------
+Motor de clasificación en cascada de 2 niveles para movimientos bancarios.
+
+Estrategia de Clasificación:
+- Nivel 1 (BASE): Clasificación por campo "Concepto" (siempre disponible)
+- Nivel 2 (REFINAMIENTO): Refinamiento por campo "Detalle" (cuando disponible)
+
+Objetivo: Alcanzar 99%+ de clasificación automática
+
+Autor: Sistema TORO
+Última actualización: 2025-11-27
 """
 import pandas as pd
 from typing import Tuple, Dict
@@ -9,9 +26,24 @@ from typing import Tuple, Dict
 
 class ClasificadorCascada:
     """
-    Clasifica movimientos bancarios usando estrategia de cascada:
-    - Nivel 1: Clasificación BASE por campo "Concepto" (siempre disponible)
-    - Nivel 2: REFINAMIENTO por campo "Detalle" (cuando disponible)
+    Motor de clasificación oficial de TORO · Resumen de Cuentas.
+    Versión: 2.0 (clasificación en cascada Concepto → Detalle)
+
+    Estrategia de Cascada de 2 Niveles:
+    ----------------------------------
+    - Nivel 1 (BASE): Clasificación por campo "Concepto" (siempre disponible)
+    - Nivel 2 (REFINAMIENTO): Refinamiento por campo "Detalle" (cuando disponible)
+
+    Reglas Actuales:
+    ---------------
+    - Nivel 1: 78 reglas hardcoded en _cargar_reglas_concepto()
+    - Nivel 2: 4 categorías refinables en _cargar_reglas_refinamiento()
+
+    Migración Futura:
+    ----------------
+    Las reglas hardcoded serán migradas a archivos JSON externos:
+    - data/reglas_concepto.json (Nivel 1)
+    - data/reglas_refinamiento.json (Nivel 2)
 
     Objetivo: 99%+ de clasificación automática
     """

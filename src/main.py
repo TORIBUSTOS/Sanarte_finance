@@ -1,15 +1,18 @@
 """
-Sistema de Control Financiero SANARTE
+Sistema de Control Financiero TORO
 Script principal - Bloques 1 y 2
 
-Autor: Sistema SANARTE
-Versión: 1.1 - Bloques 1 y 2
+Autor: Sistema TORO
+Versión: 1.2 - Bloques 1 y 2
 """
 import os
 import sys
 import argparse
 from glob import glob
 from datetime import datetime
+
+# Importar configuración centralizada
+from config import get_config
 
 # Importar módulos propios
 from readers.supervielle_reader import SupervielleReader
@@ -55,17 +58,22 @@ def detectar_banco(ruta_archivo: str):
         return None, None
 
 
-def consolidar_bancos(ruta_input: str = "./input", ruta_output: str = "./output", archivo_especifico: str = None):
+def consolidar_bancos(ruta_input: str = None, ruta_output: str = None, archivo_especifico: str = None):
     """
     Proceso completo de consolidación de extractos bancarios.
 
     Args:
-        ruta_input: Carpeta donde están los archivos Excel
-        ruta_output: Carpeta donde se guardarán los resultados
+        ruta_input: Carpeta donde están los archivos Excel (default: config.paths.input_dir)
+        ruta_output: Carpeta donde se guardarán los resultados (default: config.paths.output_dir)
         archivo_especifico: Nombre de archivo específico a procesar (opcional)
     """
+    # Obtener configuración
+    config = get_config()
+    ruta_input = ruta_input or config.paths.input_dir
+    ruta_output = ruta_output or config.paths.output_dir
+
     print("="*80)
-    print("SANARTE - Sistema de Control Financiero")
+    print("TORO · Resumen de Cuentas - Sistema de Control Financiero")
     print("Bloque 1: Consolidador Multi-Banco")
     print("="*80)
 
@@ -160,21 +168,60 @@ def consolidar_bancos(ruta_input: str = "./input", ruta_output: str = "./output"
     return df_consolidado, archivo_salida
 
 
+def categorizar_movimientos_df(df, categorizer=None):
+    """
+    Lógica pura: categoriza un DataFrame de movimientos.
+
+    Sin efectos secundarios: no hace prints, no lee archivos, no pide input.
+    Función testeable que solo realiza transformación de datos.
+
+    Args:
+        df: DataFrame con movimientos consolidados (pandas.DataFrame)
+        categorizer: Instancia de Categorizer (opcional, crea uno si None)
+
+    Returns:
+        Tupla (df_categorizado, df_sin_clasificar)
+        - df_categorizado: DataFrame con todas las categorías asignadas
+        - df_sin_clasificar: DataFrame solo con movimientos sin clasificar
+
+    Ejemplo:
+        >>> import pandas as pd
+        >>> df = pd.DataFrame({'Concepto': ['transferencia'], 'Detalle': ['pago']})
+        >>> df_cat, df_sin_cat = categorizar_movimientos_df(df)
+        >>> len(df_cat)  # Retorna DataFrame categorizado
+    """
+    import pandas as pd
+
+    # Crear categorizador si no se provee uno
+    if categorizer is None:
+        categorizer = Categorizer()
+
+    # Lógica pura de negocio (sin prints ni inputs)
+    df_categorizado = categorizer.categorizar_dataframe(df)
+    df_sin_clasificar = categorizer.obtener_sin_clasificar(df_categorizado)
+
+    return df_categorizado, df_sin_clasificar
+
+
 def categorizar_movimientos(ruta_archivo_consolidado: str = None,
-                            ruta_output: str = "./output",
+                            ruta_output: str = None,
                             revisar_manual: bool = True):
     """
     Categoriza movimientos consolidados.
 
     Args:
         ruta_archivo_consolidado: Ruta al archivo consolidado (si None, busca el más reciente)
-        ruta_output: Carpeta de salida
+        ruta_output: Carpeta de salida (default: config.paths.output_dir)
         revisar_manual: Si True, abre CLI para corrección de movimientos sin clasificar
     """
     import pandas as pd
 
+    # Obtener configuración
+    config = get_config()
+    ruta_output = ruta_output or config.paths.output_dir
+
     print("="*80)
-    print("SANARTE - Sistema de Control Financiero")
+    print("TORO · Resumen de Cuentas - Sistema de Control Financiero")
     print("Bloque 2: Categorizador Inteligente")
     print("="*80)
 
@@ -203,11 +250,8 @@ def categorizar_movimientos(ruta_archivo_consolidado: str = None,
     # Crear categorizador
     categorizer = Categorizer()
 
-    # Categorizar
-    df_categorizado = categorizer.categorizar_dataframe(df)
-
-    # Obtener movimientos sin clasificar
-    df_sin_clasificar = categorizer.obtener_sin_clasificar(df_categorizado)
+    # Llamar a la función pura de categorización (lógica de negocio separada)
+    df_categorizado, df_sin_clasificar = categorizar_movimientos_df(df, categorizer)
 
     # Revisión manual si hay movimientos sin clasificar y se solicita
     if len(df_sin_clasificar) > 0 and revisar_manual:
@@ -248,7 +292,7 @@ def categorizar_movimientos(ruta_archivo_consolidado: str = None,
     total_clasificados = len(df_categorizado[df_categorizado['Categoria_Principal'] != 'Sin Clasificar'])
     porcentaje = (total_clasificados / len(df_categorizado)) * 100
 
-    print(f"\nEstadisticas finales:")
+    print(f"\nEstadísticas finales:")
     print(f"  Total movimientos: {len(df_categorizado)}")
     print(f"  Clasificados: {total_clasificados} ({porcentaje:.1f}%)")
     print(f"  Sin clasificar: {len(df_categorizado) - total_clasificados} ({100-porcentaje:.1f}%)")
@@ -257,21 +301,25 @@ def categorizar_movimientos(ruta_archivo_consolidado: str = None,
 
 
 def generar_reportes(ruta_archivo_categorizado: str = None,
-                     ruta_output: str = "./output",
+                     ruta_output: str = None,
                      abrir_dashboard: bool = True):
     """
     Genera reportes y dashboard desde movimientos categorizados.
 
     Args:
         ruta_archivo_categorizado: Ruta al archivo categorizado (si None, busca el más reciente)
-        ruta_output: Carpeta de salida
+        ruta_output: Carpeta de salida (default: config.paths.output_dir)
         abrir_dashboard: Si True, intenta abrir el dashboard en el navegador
     """
     import pandas as pd
     import webbrowser
 
+    # Obtener configuración
+    config = get_config()
+    ruta_output = ruta_output or config.paths.output_dir
+
     print("="*80)
-    print("SANARTE - Sistema de Control Financiero")
+    print("TORO · Resumen de Cuentas - Sistema de Control Financiero")
     print("Bloque 3: Reportes y Dashboard")
     print("="*80)
 
@@ -345,7 +393,7 @@ def main():
     Punto de entrada principal del sistema.
     """
     parser = argparse.ArgumentParser(
-        description="Sistema SANARTE - Control Financiero",
+        description="Sistema TORO · Resumen de Cuentas - Control Financiero",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Ejemplos de uso:
@@ -407,18 +455,21 @@ Para más información, consulta el README.md
         help='No abrir dashboard en navegador (solo para --reportes)'
     )
 
+    # Obtener configuración para defaults
+    config = get_config()
+
     parser.add_argument(
         '--input',
         type=str,
-        default='./input',
-        help='Carpeta con archivos Excel de entrada (default: ./input)'
+        default=config.paths.input_dir,
+        help=f'Carpeta con archivos Excel de entrada (default: {config.paths.input_dir})'
     )
 
     parser.add_argument(
         '--output',
         type=str,
-        default='./output',
-        help='Carpeta para archivos de salida (default: ./output)'
+        default=config.paths.output_dir,
+        help=f'Carpeta para archivos de salida (default: {config.paths.output_dir})'
     )
 
     args = parser.parse_args()

@@ -1,7 +1,28 @@
 """
-Categorizador de movimientos bancarios
-Autor: Sistema SANARTE
-Versión: 2.0 - Sistema de Cascada de 2 Niveles
+Categorizador de Movimientos Bancarios - TORO · Resumen de Cuentas
+===================================================================
+
+Sistema: TORO (anteriormente SANARTE)
+Módulo: Categorizer (Orquestador)
+Versión: 2.0
+Última actualización: 2025-11-27
+
+Descripción:
+-----------
+Orquestador que coordina la categorización de movimientos bancarios
+usando el motor oficial ClasificadorCascada v2.0.
+
+Motor de Clasificación:
+----------------------
+- ClasificadorCascada: Motor oficial de clasificación en cascada
+- MetadataExtractor: Extractor de información adicional (nombres, CUIT, DEBIN)
+
+Sistema de Cascada de 2 Niveles:
+--------------------------------
+- Nivel 1: Clasificación BASE por "Concepto" (siempre disponible)
+- Nivel 2: Refinamiento por "Detalle" (cuando disponible)
+
+Objetivo: 99%+ de clasificación automática
 """
 import pandas as pd
 from .clasificador_cascada import ClasificadorCascada
@@ -9,9 +30,28 @@ from .metadata_extractor import MetadataExtractor
 
 class Categorizer:
     """
-    Categoriza movimientos bancarios automáticamente usando estrategia de cascada:
-    - Nivel 1: Clasificación BASE por "Concepto" (siempre disponible)
-    - Nivel 2: Refinamiento por "Detalle" (cuando disponible)
+    Orquestador de categorización para TORO · Resumen de Cuentas.
+
+    Coordina el proceso de categorización utilizando:
+    ------------------------------------------------
+    - ClasificadorCascada v2.0: Motor oficial de clasificación
+    - MetadataExtractor: Extracción de información adicional
+
+    Motor Oficial:
+    -------------
+    ClasificadorCascada - Sistema de cascada de 2 niveles:
+    - Nivel 1 (BASE): Clasificación por campo "Concepto"
+    - Nivel 2 (REFINAMIENTO): Refinamiento por campo "Detalle"
+
+    Columnas Generadas:
+    ------------------
+    - Tipo_Movimiento: "Ingreso" o "Egreso"
+    - Categoria_Principal: Grupo principal (ej: "Servicios")
+    - Categoria_Final: Categoría completa refinada (ej: "Servicios - Agua")
+    - Persona_Nombre: Nombre extraído del movimiento
+    - Documento: CUIT/DNI detectado
+    - Es_DEBIN: Boolean indicando si es DEBIN
+    - DEBIN_ID: ID del DEBIN si aplica
 
     Objetivo: 99%+ de clasificación automática
     """

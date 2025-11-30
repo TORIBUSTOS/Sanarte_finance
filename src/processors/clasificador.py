@@ -1,6 +1,28 @@
 """
-Motor de clasificación de movimientos bancarios
-Autor: Sistema SANARTE
+⚠️  LEGACY - Motor de Clasificación v1.0 (DEPRECADO)
+====================================================
+
+IMPORTANTE: Este archivo es código LEGACY y NO se usa en producción.
+
+Sistema: TORO (anteriormente SANARTE)
+Motor: Clasificador v1.0
+Estado: DEPRECADO - Solo referencia histórica
+
+Motor Oficial Actual:
+--------------------
+ClasificadorCascada v2.0 (clasificador_cascada.py)
+- Sistema de cascada de 2 niveles (Concepto + Detalle)
+- 78+ reglas de producción
+- 99%+ cobertura de clasificación
+
+¿Por qué este archivo está deprecado?
+------------------------------------
+- Usaba data/reglas.json que ya no existe
+- Sistema de reglas menos robusto
+- Reemplazado completamente por ClasificadorCascada v2.0
+
+Este archivo se mantiene solo para referencia histórica.
+NO modificar. NO usar en código nuevo.
 """
 import json
 import os
@@ -9,7 +31,16 @@ import pandas as pd
 
 class Clasificador:
     """
-    Clasifica movimientos bancarios según reglas predefinidas y aprendidas.
+    ⚠️  DEPRECADO - NO USAR
+
+    Motor de clasificación v1.0 (LEGACY).
+    Este código NO se usa en producción.
+
+    Usar en su lugar:
+    ----------------
+    from processors.clasificador_cascada import ClasificadorCascada
+
+    ClasificadorCascada v2.0 es el motor oficial de TORO.
     """
 
     def __init__(self, ruta_reglas: str = "./data/reglas.json"):

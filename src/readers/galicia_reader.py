@@ -1,6 +1,6 @@
 """
-Lector de archivos Excel del Banco Galicia
-Autor: Sistema SANARTE
+Lector de archivos Excel del Banco Galicia - TORO · Resumen de Cuentas
+Autor: Sistema TORO
 """
 import pandas as pd
 from typing import Optional

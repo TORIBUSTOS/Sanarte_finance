@@ -1,55 +1,74 @@
-# SANARTE - Sistema de Control Financiero
+# 🐂 TORO · Resumen de Cuentas
 
-![Version](https://img.shields.io/badge/version-1.3-blue.svg)
+![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)
 ![Python](https://img.shields.io/badge/python-3.8+-brightgreen.svg)
-![Status](https://img.shields.io/badge/status-stable-success.svg)
-![Made with](https://img.shields.io/badge/made%20with-Python-1f425f.svg)
+![Tests](https://img.shields.io/badge/tests-26%20passed-success.svg)
+![Coverage](https://img.shields.io/badge/coverage-90%25%20core-brightgreen.svg)
+![Status](https://img.shields.io/badge/status-production-success.svg)
 
-Sistema automatizado para procesamiento de extractos bancarios de múltiples bancos.
+Sistema profesional de análisis y control financiero con procesamiento automatizado de extractos bancarios multi-banco.
 
-**Version:** 1.3 - Bloques 1, 2, 3 y 4 (Consolidador + Categorizador + Reportes + Orquestador CLI)
-**Autor:** Sistema SANARTE
+**Versión:** 2.0.0 - Release de Producción
+**Sistema:** TORO (anteriormente SANARTE)
+**Autor:** Sistema TORO
 **Fecha:** Noviembre 2025
 
 ---
 
-## BLOQUES IMPLEMENTADOS
+## ✨ Novedades en v2.0.0
 
-### BLOQUE 1: Consolidador Multi-Banco ✓
+### 🚀 Motor ClasificadorCascada v2.0
+- Sistema de clasificación de 2 niveles (Concepto + Detalle)
+- 37 reglas de nivel 1 + 24 patrones de refinamiento
+- Cobertura del 99%+ de movimientos comunes
+- Sistema de reglas externas en JSON (preparado para expansión)
 
-1. **Detección automática de banco** por estructura de columnas
-2. **Lector Supervielle**: Lectura directa del formato ideal
-3. **Lector Galicia**: Limpieza de columnas basura y normalización
-4. **Normalizador**: Unificación de formatos de fecha y números
-5. **Consolidador**: Une movimientos de múltiples bancos y exporta a Excel
+### 🎨 Dashboard TORO
+- Rediseño visual completo con paleta verde petróleo (#059669)
+- Branding unificado "TORO · Resumen de Cuentas"
+- Gráficos interactivos con Chart.js
+- Responsive design mobile/desktop
 
-### BLOQUE 2: Categorizador Inteligente ✓
+### ⚙️ Arquitectura Mejorada
+- **Configuración centralizada** (`src/config.py`)
+- **Lógica pura testeable** (separada de CLI)
+- **Suite de tests completa** (26 tests, 90% coverage en módulos core)
+- **Sin rutas hardcodeadas** - portable entre sistemas
 
-1. **Motor de clasificación** con 24 reglas predefinidas
-2. **Categorización automática** de 80%+ de movimientos
-3. **Extractor de metadata**: Nombres, CUIT, DEBIN
-4. **Sistema de aprendizaje** que mejora con el uso
-5. **CLI de corrección manual** para movimientos sin clasificar
-6. **Exportación categorizada** a Excel con 14 columnas
+### 📦 Empaquetado Profesional
+- Ejecutable standalone con PyInstaller
+- Paquete distribuible listo para producción
+- No requiere Python instalado
+- INICIAR_TORO.bat para usuarios
 
-### BLOQUE 3: Reportes y Dashboard ✓
+---
 
-1. **Analizador financiero** con métricas clave (ingresos, egresos, saldos inicial/final)
-2. **Dashboard HTML interactivo** con Chart.js (gráficos de torta y línea)
-3. **Reporte Excel ejecutivo** con 5 hojas formateadas profesionalmente
-4. **Saldos inicial/final** en hojas de Ingresos y Egresos
-5. **Top 10 prestadores** con montos totales
-6. **Flujo de caja diario** visualizado
-7. **Alertas automáticas** si egresos > ingresos
+## 🏗️ COMPONENTES DEL SISTEMA
 
-### BLOQUE 4: Orquestador CLI ✓
+### 1. Consolidador Multi-Banco ✓
+- Detección automática por estructura de columnas
+- Soporte Galicia y Supervielle
+- Normalización de fechas y números
+- Exportación consolidada a Excel
 
-1. **Menú principal interactivo** con interfaz amigable
-2. **Proceso completo automatizado** (consolidar → categorizar → reportes)
-3. **Ejecución individual de bloques** bajo demanda
-4. **Información del sistema** y configuración
-5. **Archivo de inicio rápido** (INICIAR.bat para Windows)
-6. **Navegación intuitiva** con confirmaciones y mensajes claros
+### 2. Categorizador Cascada v2.0 ✓
+- Motor de 2 niveles (Concepto → Detalle)
+- Categorización automática >95%
+- Extracción de metadata (DEBIN, nombres, CUIT)
+- CLI de corrección manual para casos especiales
+
+### 3. Reportes y Analytics ✓
+- Dashboard HTML interactivo con diseño TORO
+- Análisis financiero completo (ingresos, egresos, flujo)
+- Reporte Excel ejecutivo (5 hojas)
+- Top prestadores y alertas automáticas
+- Gráficos de flujo de caja diario
+
+### 4. Orquestador CLI ✓
+- Menú interactivo con rich
+- Flujo completo automatizado
+- Ejecución modular de componentes
+- Configuración centralizada
 
 ---
 

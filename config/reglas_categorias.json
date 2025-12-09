@@ -1,3 +1,24 @@
 {
-  "reglas": []
+  "reglas": [
+    {
+      "criterio": "Concepto",
+      "valor": "I.V.A. Percep. Resp. Inscripto",
+      "categoria_id": "IMPUESTOS"
+    },
+    {
+      "criterio": "Concepto",
+      "valor": "CRED BCA ELECTR INTERBANC EXEN",
+      "categoria_id": "CUENTAS_PROPIAS"
+    },
+    {
+      "criterio": "Concepto",
+      "valor": "Comisión Riesgo Contingente",
+      "categoria_id": "COMISIONES_BANCARIAS"
+    },
+    {
+      "criterio": "Concepto",
+      "valor": "Remuneración de Saldo",
+      "categoria_id": "INTERESES"
+    }
+  ]
 }

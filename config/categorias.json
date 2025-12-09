@@ -1,9 +1,13 @@
 {
   "categorias": [
-    { "id": "PRESTADORES", "nombre": "Prestadores" },
-    { "id": "PROVEEDORES", "nombre": "Proveedores" },
-    { "id": "HONORARIOS", "nombre": "Honorarios profesionales" },
-    { "id": "CUENTAS_PROPIAS", "nombre": "Transferencias a cuentas propias" },
-    { "id": "SIN_CATEGORIA", "nombre": "Sin categoría" }
+    { "id": "PRESTADORES",            "nombre": "Prestadores" },
+    { "id": "PROVEEDORES",            "nombre": "Proveedores" },
+    { "id": "HONORARIOS",             "nombre": "Honorarios profesionales" },
+    { "id": "CUENTAS_PROPIAS",        "nombre": "Transferencias a cuentas propias" },
+    { "id": "SIN_CATEGORIA",          "nombre": "Sin categoría" },
+    { "id": "SOCIOS",                 "nombre": "Retiro socios" },
+    { "id": "IMPUESTOS",              "nombre": "Impuestos y Percepciones AFIP" },
+    { "id": "COMISIONES_BANCARIAS",   "nombre": "Comisiones bancarias" },
+    { "id": "INTERESES",              "nombre": "Intereses bancarios" }
   ]
 }

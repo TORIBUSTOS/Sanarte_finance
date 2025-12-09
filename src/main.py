@@ -20,10 +20,13 @@ from readers.galicia_reader import GaliciaReader
 from processors.normalizer import Normalizer
 from processors.consolidator import Consolidator
 from processors.categorizer import Categorizer
-from utils.cli_corrector import CLICorrector
 from reports.analyzer import Analyzer
 from reports.dashboard_generator import DashboardGenerator
 from reports.excel_exporter import ExcelExporter
+
+# Importar módulo de categorización interactiva
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+from toro_categorizacion_interactiva import procesar_movimientos_sin_clasificar
 
 
 def obtener_carpeta_mes(df, ruta_output):
@@ -304,17 +307,10 @@ def categorizar_movimientos(ruta_archivo_consolidado: str = None,
         respuesta = input("\nDeseas revisar y corregir manualmente estos movimientos? (S/N): ").strip().upper()
 
         if respuesta in ['S', 'SI', 'Y', 'YES']:
-            # Obtener categorías del clasificador
-            categorias = categorizer.clasificador.obtener_categorias()
-
-            # Crear CLI corrector
-            cli = CLICorrector(categorias)
-
-            # Procesar
-            df_categorizado = cli.procesar_sin_clasificar(
+            # Procesar movimientos interactivamente usando el nuevo sistema
+            df_categorizado = procesar_movimientos_sin_clasificar(
                 df_sin_clasificar=df_sin_clasificar,
-                df_completo=df_categorizado,
-                categorizer=categorizer
+                df_completo=df_categorizado
             )
 
     # Obtener carpeta del mes y generar nombre de archivo

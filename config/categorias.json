@@ -1,0 +1,9 @@
+{
+  "categorias": [
+    { "id": "PRESTADORES", "nombre": "Prestadores" },
+    { "id": "PROVEEDORES", "nombre": "Proveedores" },
+    { "id": "HONORARIOS", "nombre": "Honorarios profesionales" },
+    { "id": "CUENTAS_PROPIAS", "nombre": "Transferencias a cuentas propias" },
+    { "id": "SIN_CATEGORIA", "nombre": "Sin categoría" }
+  ]
+}

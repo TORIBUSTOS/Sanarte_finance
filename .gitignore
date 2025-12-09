@@ -32,10 +32,15 @@ Thumbs.db
 .env.local
 credentials.json
 
-# Archivos generados
-output/*.xlsx
-output/*.html
-output/*.pdf
+# Archivos generados y carpetas de output
+output/
+test_output/
+test_output*/
+*.backup
+
+# Archivos temporales de Excel
+~$*.xlsx
+~$*.xls
 
 # Testing y coverage
 .coverage

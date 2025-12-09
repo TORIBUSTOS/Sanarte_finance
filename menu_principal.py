@@ -18,6 +18,7 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 from main import consolidar_bancos, categorizar_movimientos, generar_reportes
 from config import get_config
 from glob import glob
+from toro_categorias import menu_categorias
 
 # Rich imports para interfaz mejorada
 from rich.console import Console
@@ -157,6 +158,7 @@ def mostrar_menu_principal():
     menu.add_row("", "")
     menu.add_row("5", "⚙️  Configuración de rutas")
     menu.add_row("6", "ℹ️  Información del sistema")
+    menu.add_row("7", "🧾 Gestión de categorías")
     menu.add_row("", "")
     menu.add_row("0", "🚪 SALIR", style="dim")
 
@@ -396,7 +398,7 @@ def main():
         try:
             opcion = Prompt.ask(
                 "[bold cyan]Selecciona una opción[/bold cyan]",
-                choices=['0', '1', '2', '3', '4', '5', '6'],
+                choices=['0', '1', '2', '3', '4', '5', '6', '7'],
                 default='1'
             ).strip()
 
@@ -429,6 +431,9 @@ def main():
 
             elif opcion == '6':
                 informacion_sistema()
+
+            elif opcion == '7':
+                menu_categorias()
 
             else:
                 console.print("\n[bold red]❌ ERROR:[/bold red] Opción inválida. Por favor selecciona una opción del menú.")

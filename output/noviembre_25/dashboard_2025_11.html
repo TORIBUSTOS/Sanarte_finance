@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TORO · Resumen de Cuentas – Dashboard Financiero</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        /*
+        TORO Color Palette:
+        --toro-verde: #059669 (verde petróleo - color principal)
+        --toro-verde-oscuro: #047857 (verde oscuro)
+        --toro-acento: #0ea5e9 (azul acento)
+        --toro-verde-claro: #10b981 (verde claro para destacados)
+        */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #059669 0%, #0ea5e9 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-left: 4px solid;
+        }
+
+        .card.ingresos {
+            border-color: #28a745;
+        }
+
+        .card.egresos {
+            border-color: #dc3545;
+        }
+
+        .card.variacion {
+            border-color: #28a745;
+        }
+
+        .card.clasificados {
+            border-color: #0ea5e9;
+        }
+
+        .card.saldo-inicial {
+            border-color: #059669;
+        }
+
+        .card.saldo-final {
+            border-color: #0ea5e9;
+        }
+
+        .card.debin {
+            border-color: #10b981;
+        }
+
+        .card.prestadores {
+            border-color: #059669;
+        }
+
+        .card.mayor-egreso {
+            border-color: #dc3545;
+        }
+
+        .card.mayor-ingreso {
+            border-color: #10b981;
+        }
+
+        .card-title {
+            font-size: 0.9em;
+            color: #666;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .card-value {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .card.ingresos .card-value {
+            color: #28a745;
+        }
+
+        .card.egresos .card-value {
+            color: #dc3545;
+        }
+
+        .card.variacion .card-value {
+            color: #28a745;
+        }
+
+        .card.clasificados .card-value {
+            color: #0ea5e9;
+        }
+
+        .card.saldo-inicial .card-value {
+            color: #059669;
+        }
+
+        .card.saldo-final .card-value {
+            color: #0ea5e9;
+        }
+
+        .card.debin .card-value {
+            color: #10b981;
+        }
+
+        .card.prestadores .card-value {
+            color: #059669;
+        }
+
+        .card.mayor-egreso .card-value {
+            color: #dc3545;
+        }
+
+        .card.mayor-ingreso .card-value {
+            color: #10b981;
+        }
+
+        .card-subtitle {
+            font-size: 0.85em;
+            color: #999;
+        }
+
+        .charts {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .chart-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .chart-full {
+            grid-column: 1 / -1;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .alert {
+            background-color: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+            color: #856404;
+        }
+
+        .alert-danger {
+            background-color: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+
+        .alert-info {
+            background-color: #d1ecf1;
+            border-color: #17a2b8;
+            color: #0c5460;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+
+        .summary-table {
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        .summary-table th {
+            background: #059669;
+            color: white;
+            padding: 12px;
+            text-align: right;
+        }
+
+        .summary-table th:first-child {
+            text-align: left;
+        }
+
+        .summary-table td {
+            padding: 10px;
+            text-align: right;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .summary-table td:first-child {
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .summary-table .neto-positivo {
+            color: #28a745;
+            font-weight: 600;
+        }
+
+        .summary-table .neto-negativo {
+            color: #dc3545;
+            font-weight: 600;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 768px) {
+            .charts {
+                grid-template-columns: 1fr;
+            }
+
+            .cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>TORO · Resumen de Cuentas</h1>
+            <p>Generado el 06/12/2025 17:07</p>
+        </div>
+
+        <div class="content">
+            <!-- Alertas Inteligentes -->
+            <div class="alert alert-info"><strong>📊 Buena clasificación:</strong> 518 de 521 clasificadas (99.4%)</div>
+<div class="alert alert-info"><strong>📊 Red prestacional:</strong> 10 prestadores activos este mes ($7,783,096 total)</div>
+<div class="alert alert-info"><strong>💳 Ingresos por DEBIN:</strong> 11 transacciones por $4,476,455 (promedio $406,950)</div>
+
+            <!-- Cards de métricas principales -->
+            <div class="cards">
+                <div class="card saldo-inicial">
+                    <div class="card-title">Saldo Inicial</div>
+                    <div class="card-value">$1,336,671.62</div>
+                </div>
+
+                <div class="card ingresos">
+                    <div class="card-title">Total Ingresos</div>
+                    <div class="card-value">$40,277,564.83</div>
+                </div>
+
+                <div class="card egresos">
+                    <div class="card-title">Total Egresos</div>
+                    <div class="card-value">$26,684,132.64</div>
+                </div>
+
+                <div class="card saldo-final">
+                    <div class="card-title">Saldo Final</div>
+                    <div class="card-value">$14,930,103.81</div>
+                </div>
+
+                <div class="card variacion">
+                    <div class="card-title">Variación del Mes</div>
+                    <div class="card-value">$13,593,432.19</div>
+                </div>
+
+                <div class="card clasificados">
+                    <div class="card-title">Movimientos Clasificados</div>
+                    <div class="card-value">99.4%</div>
+                    <div class="card-subtitle">518 de 521</div>
+                </div>
+
+                <div class="card debin">
+                    <div class="card-title">💳 Ingresos DEBIN</div>
+                    <div class="card-value">$4,476,455.00</div>
+                    <div class="card-subtitle">11 transacciones</div>
+                </div>
+
+                <div class="card prestadores">
+                    <div class="card-title">👥 Prestadores Activos</div>
+                    <div class="card-value">10</div>
+                    <div class="card-subtitle">Total pagado: $7,783,096</div>
+                </div>
+
+                <div class="card mayor-egreso">
+                    <div class="card-title">💰 Mayor Categoría Egreso</div>
+                    <div class="card-value">$8,055,287</div>
+                    <div class="card-subtitle">Egresos - Transferencias Varia (30.2%)</div>
+                </div>
+
+                <div class="card mayor-ingreso">
+                    <div class="card-title">📊 Mayor Categoría Ingreso</div>
+                    <div class="card-value">$26,012,107</div>
+                    <div class="card-subtitle">Ingresos - Obras Sociales (64.6%)</div>
+                </div>
+            </div>
+
+            <!-- Gráficos -->
+            <div class="charts">
+                <!-- Gráfico de Ingresos -->
+                <div class="chart-container">
+                    <div class="chart-title">Ingresos por Categoría</div>
+                    <canvas id="chartIngresos"></canvas>
+                </div>
+
+                <!-- Gráfico de Egresos -->
+                <div class="chart-container">
+                    <div class="chart-title">Top 10 Egresos por Categoría</div>
+                    <canvas id="chartEgresos"></canvas>
+                </div>
+
+                <!-- Gráfico de Flujo de Caja -->
+                <div class="chart-container chart-full">
+                    <div class="chart-title">Flujo de Caja Diario</div>
+                    <canvas id="chartFlujo"></canvas>
+                </div>
+            </div>
+
+            <!-- Tabla Resumen por Categoría Principal -->
+            <div class="chart-container chart-full">
+                <div class="chart-title">📊 Resumen por Categoría Principal</div>
+                <table class="summary-table">
+                    <thead>
+                        <tr>
+                            <th>Categoría</th>
+                            <th>Transacciones</th>
+                            <th>Ingresos</th>
+                            <th>Egresos</th>
+                            <th>Neto</th>
+                        </tr>
+                    </thead>
+                    <tbody id="summaryTableBody">
+                        <!-- Generado dinámicamente por JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Tabla de Top Prestadores -->
+            
+        <div class="chart-container">
+            <div class="chart-title">Top Prestadores</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Nombre</th>
+                        <th>Monto Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+        
+                    <tr>
+                        <td>1</td>
+                        <td>TOSIN GUADALUPE ANAHI</td>
+                        <td>$1,300,000.00</td>
+                    </tr>
+            
+                    <tr>
+                        <td>2</td>
+                        <td>TOSIN MARCO ANTONIO</td>
+                        <td>$830,000.00</td>
+                    </tr>
+            
+                    <tr>
+                        <td>3</td>
+                        <td>FARMACIAS LIDER S</td>
+                        <td>$606,732.00</td>
+                    </tr>
+            
+                    <tr>
+                        <td>4</td>
+                        <td>TOSIN SONIA BEATRIZ</td>
+                        <td>$600,000.00</td>
+                    </tr>
+            
+                    <tr>
+                        <td>5</td>
+                        <td>PICATTO ALDANA SOFIA</td>
+                        <td>$500,000.00</td>
+                    </tr>
+            
+                    <tr>
+                        <td>6</td>
+                        <td>BERNARDI ELIANA GABRIELA</td>
+                        <td>$400,000.00</td>
+                    </tr>
+            
+                    <tr>
+                        <td>7</td>
+                        <td>FRANDINO ROMINA LAURA</td>
+                        <td>$315,147.00</td>
+                    </tr>
+            
+                    <tr>
+                        <td>8</td>
+                        <td>DECADE S</td>
+                        <td>$173,867.00</td>
+                    </tr>
+            
+                    <tr>
+                        <td>9</td>
+                        <td>SONIA CBU</td>
+                        <td>$120,000.00</td>
+                    </tr>
+            
+                    <tr>
+                        <td>10</td>
+                        <td>PLIZZO MARIA CLAUDIA</td>
+                        <td>$33,200.00</td>
+                    </tr>
+            
+                </tbody>
+            </table>
+        </div>
+        
+
+            <!-- Tabla de Movimientos Sin Clasificar -->
+            
+        <div class="chart-container">
+            <div class="chart-title">Movimientos Sin Clasificar (3)</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Concepto</th>
+                        <th>Débito</th>
+                        <th>Crédito</th>
+                    </tr>
+                </thead>
+                <tbody>
+        
+                    <tr>
+                        <td>2025-11-28 04:55:11</td>
+                        <td>Remuneración de Saldo</td>
+                        <td>$0.00</td>
+                        <td>$16,481.14</td>
+                    </tr>
+            
+                    <tr>
+                        <td>2025-11-28 04:55:11</td>
+                        <td>Impuesto a las Ganancias</td>
+                        <td>$494.43</td>
+                        <td>$0.00</td>
+                    </tr>
+            
+                    <tr>
+                        <td>2025-11-26 03:03:16</td>
+                        <td>CRED BCA ELECTR INTERBANC EXEN</td>
+                        <td>$0.00</td>
+                        <td>$3,343,150.00</td>
+                    </tr>
+            
+                </tbody>
+            </table>
+        </div>
+        
+        </div>
+
+        <div class="footer">
+            &copy; 2025 TORO · Resumen de Cuentas | Generado automáticamente
+        </div>
+    </div>
+
+    <script>
+        // Datos para gráficos
+        const datosIngresos = {"labels": ["Ingresos - Obras Sociales", "Ingresos - Transferencias", "Ingresos - DEBIN Afiliados", "Sin Clasificar - Requiere Revisi\u00f3n", "Ingresos - Intereses"], "values": [26012106.65, 6429372.0, 4476455.0, 3359631.14, 0.04]};
+        const datosEgresos = {"labels": ["Egresos - Transferencias Varias", "Prestadores - Profesionales", "Gastos Operativos - Sueldos", "Prestadores - Pagos", "Egresos - DEBIN", "Ingresos - Tarjetas", "Gastos Operativos - Vi\u00e1ticos", "Servicios - Electricidad", "Impuestos - IIBB", "Impuestos - AFIP"], "values": [8055287.0, 4272214.0, 4200000.0, 2904150.0, 1602080.82, 981811.63, 853792.67, 716285.7, 653126.6699999999, 627980.74]};
+        const datosFlujo = {"labels": ["2025-11-02", "2025-11-03", "2025-11-04", "2025-11-05", "2025-11-06", "2025-11-07", "2025-11-08", "2025-11-09", "2025-11-10", "2025-11-11", "2025-11-12", "2025-11-13", "2025-11-14", "2025-11-15", "2025-11-16", "2025-11-17", "2025-11-18", "2025-11-19", "2025-11-20", "2025-11-21", "2025-11-22", "2025-11-23", "2025-11-24", "2025-11-25", "2025-11-26", "2025-11-27", "2025-11-28", "2025-11-29", "2025-11-30"], "ingresos": [0.0, 75000.04, 1302000.0, 613842.0, 453899.0, 13555845.18, 118999.0, 0.0, 1968122.0, 269072.0, 432348.55, 1857090.45, 133900.0, 0.0, 0.0, 0.0, 468710.0, 520000.0, 946403.0, 85800.0, 0.0, 23000.0, 0.0, 713462.0, 332680.0, 174300.0, 12873460.47, 0.0, 0.0], "egresos": [418400.43, 2071393.75, 136619.4, 174237.09, 55757.24, 716433.83, 3108.25, 7042.0, 8523188.53, 1342861.86, 365214.2, 487352.48000000004, 424660.24, 40671.57, 61353.920000000006, 2357429.78, 277503.36, 430659.04, 985209.19, 605841.1, 14084.0, 363848.06, 70625.09, 1997887.27, 2858029.73, 728067.88, 655614.28, 510142.24, 402.4]};
+        const resumenCategorias = [{"categoria": "Egresos", "transacciones": 18, "ingresos": 0.0, "egresos": 9657367.82, "neto": -9657367.82}, {"categoria": "Prestadores", "transacciones": 20, "ingresos": 0.0, "egresos": 7783096.0, "neto": -7783096.0}, {"categoria": "Gastos Operativos", "transacciones": 60, "ingresos": 0.0, "egresos": 5237054.15, "neto": -5237054.15}, {"categoria": "Impuestos", "transacciones": 329, "ingresos": 0.0, "egresos": 1668278.7000000002, "neto": -1668278.7000000002}, {"categoria": "Servicios", "transacciones": 17, "ingresos": 0.0, "egresos": 1288429.56, "neto": -1288429.56}, {"categoria": "Ingresos", "transacciones": 59, "ingresos": 36917933.690000005, "egresos": 981811.63, "neto": 35936122.06}, {"categoria": "Comisiones Bancarias", "transacciones": 15, "ingresos": 0.0, "egresos": 67600.35, "neto": -67600.35}];
+
+        // Llenar tabla de resumen por categoría principal
+        const summaryTableBody = document.getElementById('summaryTableBody');
+        resumenCategorias.forEach(cat => {
+            const row = document.createElement('tr');
+            const netoClass = cat.neto >= 0 ? 'neto-positivo' : 'neto-negativo';
+            row.innerHTML = `
+                <td>${cat.categoria}</td>
+                <td>${cat.transacciones.toLocaleString('es-AR')}</td>
+                <td>$${cat.ingresos.toLocaleString('es-AR', {minimumFractionDigits: 0, maximumFractionDigits: 0})}</td>
+                <td>$${cat.egresos.toLocaleString('es-AR', {minimumFractionDigits: 0, maximumFractionDigits: 0})}</td>
+                <td class="${netoClass}">$${cat.neto.toLocaleString('es-AR', {minimumFractionDigits: 0, maximumFractionDigits: 0})}</td>
+            `;
+            summaryTableBody.appendChild(row);
+        });
+
+        // Gráfico de Ingresos (Torta)
+        new Chart(document.getElementById('chartIngresos'), {
+            type: 'pie',
+            data: {
+                labels: datosIngresos.labels,
+                datasets: [{
+                    data: datosIngresos.values,
+                    backgroundColor: [
+                        '#059669',  // TORO verde petróleo
+                        '#10b981',  // TORO verde claro
+                        '#0ea5e9',  // TORO azul acento
+                        '#047857',  // TORO verde oscuro
+                        '#06b6d4'   // Cyan complementario
+                    ],
+                    borderWidth: 2,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                label += '$' + context.parsed.toLocaleString('es-AR', {minimumFractionDigits: 2});
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Gráfico de Egresos (Torta - Top 10)
+        new Chart(document.getElementById('chartEgresos'), {
+            type: 'pie',
+            data: {
+                labels: datosEgresos.labels,
+                datasets: [{
+                    data: datosEgresos.values,
+                    backgroundColor: [
+                        '#dc3545', // Rojo
+                        '#fd7e14', // Naranja
+                        '#ff6b6b', // Rojo claro
+                        '#e83e8c', // Rosa
+                        '#9b59b6', // Púrpura
+                        '#ffc107', // Amarillo
+                        '#f39c12', // Naranja oscuro
+                        '#17a2b8', // Azul
+                        '#3498db', // Azul claro
+                        '#6c757d'  // Gris
+                    ],
+                    borderWidth: 2,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                label += '$' + context.parsed.toLocaleString('es-AR', {minimumFractionDigits: 2});
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Gráfico de Flujo de Caja (Líneas)
+        new Chart(document.getElementById('chartFlujo'), {
+            type: 'line',
+            data: {
+                labels: datosFlujo.labels,
+                datasets: [
+                    {
+                        label: 'Ingresos',
+                        data: datosFlujo.ingresos,
+                        borderColor: '#059669',
+                        backgroundColor: 'rgba(5, 150, 105, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    },
+                    {
+                        label: 'Egresos',
+                        data: datosFlujo.egresos,
+                        borderColor: '#dc3545',
+                        backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                label += '$' + context.parsed.y.toLocaleString('es-AR', {minimumFractionDigits: 2});
+                                return label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + value.toLocaleString('es-AR');
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -26,6 +26,45 @@ from reports.dashboard_generator import DashboardGenerator
 from reports.excel_exporter import ExcelExporter
 
 
+def obtener_carpeta_mes(df, ruta_output):
+    """
+    Obtiene la carpeta del mes basada en las fechas del DataFrame.
+
+    Args:
+        df: DataFrame con columna 'Fecha'
+        ruta_output: Ruta base de output
+
+    Returns:
+        Ruta de la carpeta del mes (ej: output/octubre_25)
+    """
+    import pandas as pd
+
+    if len(df) > 0 and 'Fecha' in df.columns:
+        fecha_datos = pd.to_datetime(df['Fecha'].iloc[0])
+        anio = fecha_datos.year
+        mes = fecha_datos.month
+    else:
+        from datetime import datetime
+        fecha_actual = datetime.now()
+        anio = fecha_actual.year
+        mes = fecha_actual.month
+
+    meses = {
+        1: 'enero', 2: 'febrero', 3: 'marzo', 4: 'abril',
+        5: 'mayo', 6: 'junio', 7: 'julio', 8: 'agosto',
+        9: 'septiembre', 10: 'octubre', 11: 'noviembre', 12: 'diciembre'
+    }
+    nombre_mes = meses[mes]
+    nombre_carpeta = f"{nombre_mes}_{str(anio)[-2:]}"
+    carpeta_mes = os.path.join(ruta_output, nombre_carpeta)
+
+    # Crear carpeta si no existe
+    if not os.path.exists(carpeta_mes):
+        os.makedirs(carpeta_mes)
+
+    return carpeta_mes, anio, mes
+
+
 def detectar_banco(ruta_archivo: str):
     """
     Detecta automáticamente qué banco corresponde a un archivo Excel.
@@ -156,16 +195,17 @@ def consolidar_bancos(ruta_input: str = None, ruta_output: str = None, archivo_e
     consolidator = Consolidator(ruta_output=ruta_output)
     df_consolidado = consolidator.consolidar(dataframes_normalizados)
 
-    # Exportar
-    archivo_salida = consolidator.exportar(df_consolidado)
+    # Exportar (pasando el archivo original para copiarlo a la carpeta del mes)
+    archivo_salida, carpeta_mes = consolidator.exportar(df_consolidado, archivo_original=archivo_path)
 
     print(f"\n{'='*80}")
     print("PROCESO COMPLETADO")
     print(f"{'='*80}")
     print(f"\nArchivo generado: {archivo_salida}")
+    print(f"Todos los archivos en: {carpeta_mes}")
     print(f"\nPuedes abrir el archivo para verificar los {len(df_consolidado)} movimientos consolidados.")
 
-    return df_consolidado, archivo_salida
+    return df_consolidado, archivo_salida, carpeta_mes
 
 
 def categorizar_movimientos_df(df, categorizer=None):
@@ -227,7 +267,9 @@ def categorizar_movimientos(ruta_archivo_consolidado: str = None,
 
     # Si no se especifica archivo, buscar el más reciente
     if ruta_archivo_consolidado is None:
+        # Buscar en carpetas de mes y también en raíz
         archivos_consolidados = glob(os.path.join(ruta_output, "movimientos_consolidados_*.xlsx"))
+        archivos_consolidados.extend(glob(os.path.join(ruta_output, "*", "movimientos_consolidados_*.xlsx")))
 
         if not archivos_consolidados:
             print("\nError: No se encontraron archivos consolidados.")
@@ -275,10 +317,10 @@ def categorizar_movimientos(ruta_archivo_consolidado: str = None,
                 categorizer=categorizer
             )
 
-    # Generar nombre de archivo de salida
-    fecha_actual = datetime.now()
-    nombre_salida = f"movimientos_categorizados_{fecha_actual.year}_{fecha_actual.month:02d}.xlsx"
-    ruta_salida = os.path.join(ruta_output, nombre_salida)
+    # Obtener carpeta del mes y generar nombre de archivo
+    carpeta_mes, anio, mes = obtener_carpeta_mes(df_categorizado, ruta_output)
+    nombre_salida = f"movimientos_categorizados_{anio}_{mes:02d}.xlsx"
+    ruta_salida = os.path.join(carpeta_mes, nombre_salida)
 
     # Exportar
     categorizer.exportar_categorizados(df_categorizado, ruta_salida)
@@ -325,7 +367,9 @@ def generar_reportes(ruta_archivo_categorizado: str = None,
 
     # Si no se especifica archivo, buscar el más reciente
     if ruta_archivo_categorizado is None:
+        # Buscar en carpetas de mes y también en raíz
         archivos_categorizados = glob(os.path.join(ruta_output, "movimientos_categorizados_*.xlsx"))
+        archivos_categorizados.extend(glob(os.path.join(ruta_output, "*", "movimientos_categorizados_*.xlsx")))
 
         if not archivos_categorizados:
             print("\nError: No se encontraron archivos categorizados.")
@@ -354,17 +398,19 @@ def generar_reportes(ruta_archivo_categorizado: str = None,
     # Obtener movimientos sin clasificar
     df_sin_clasificar = analyzer.obtener_sin_clasificar()
 
+    # Obtener carpeta del mes
+    carpeta_mes, anio, mes = obtener_carpeta_mes(df, ruta_output)
+
     # Generar dashboard HTML
-    fecha_actual = datetime.now()
-    nombre_dashboard = f"dashboard_{fecha_actual.year}_{fecha_actual.month:02d}.html"
-    ruta_dashboard = os.path.join(ruta_output, nombre_dashboard)
+    nombre_dashboard = f"dashboard_{anio}_{mes:02d}.html"
+    ruta_dashboard = os.path.join(carpeta_mes, nombre_dashboard)
 
     dashboard_gen = DashboardGenerator(df, metricas)
     dashboard_gen.generar_html(ruta_dashboard)
 
     # Generar reporte ejecutivo Excel
-    nombre_reporte = f"reporte_ejecutivo_{fecha_actual.year}_{fecha_actual.month:02d}.xlsx"
-    ruta_reporte = os.path.join(ruta_output, nombre_reporte)
+    nombre_reporte = f"reporte_ejecutivo_{anio}_{mes:02d}.xlsx"
+    ruta_reporte = os.path.join(carpeta_mes, nombre_reporte)
 
     excel_exp = ExcelExporter(df, metricas)
     excel_exp.exportar(ruta_reporte)

@@ -3,8 +3,9 @@ Consolidador de movimientos multi-banco - TORO · Resumen de Cuentas
 Autor: Sistema TORO
 """
 import os
+import shutil
 from datetime import datetime
-from typing import List
+from typing import List, Tuple
 
 import pandas as pd
 
@@ -63,23 +64,65 @@ class Consolidator:
 
         return df_consolidado
 
-    def exportar(self, df: pd.DataFrame, nombre_archivo: str = None) -> str:
+    def exportar(self, df: pd.DataFrame, nombre_archivo: str = None, archivo_original: str = None) -> Tuple[str, str]:
         """
-        Exporta el DataFrame consolidado a Excel.
+        Exporta el DataFrame consolidado a Excel en una carpeta organizada por mes/año.
 
         Args:
             df: DataFrame consolidado
-            nombre_archivo: Nombre del archivo (opcional, por defecto usa fecha actual)
+            nombre_archivo: Nombre del archivo (opcional, por defecto usa fecha del período de datos)
+            archivo_original: Ruta del archivo original a copiar/mover (opcional)
 
         Returns:
-            Ruta del archivo generado
+            Tupla (ruta_archivo_generado, ruta_carpeta_mes)
         """
-        if nombre_archivo is None:
-            # Generar nombre con fecha actual: movimientos_consolidados_YYYY_MM.xlsx
+        # Extraer año y mes de la fecha más reciente en los datos
+        if len(df) > 0 and 'Fecha' in df.columns:
+            # Obtener la fecha más reciente (primera fila ya que está ordenada desc)
+            fecha_datos = pd.to_datetime(df['Fecha'].iloc[0])
+            anio = fecha_datos.year
+            mes = fecha_datos.month
+        else:
+            # Fallback: usar fecha actual
             fecha_actual = datetime.now()
-            nombre_archivo = f"movimientos_consolidados_{fecha_actual.year}_{fecha_actual.month:02d}.xlsx"
+            anio = fecha_actual.year
+            mes = fecha_actual.month
 
-        ruta_completa = os.path.join(self.ruta_output, nombre_archivo)
+        # Crear nombre de carpeta: octubre_25, noviembre_25, etc.
+        meses = {
+            1: 'enero', 2: 'febrero', 3: 'marzo', 4: 'abril',
+            5: 'mayo', 6: 'junio', 7: 'julio', 8: 'agosto',
+            9: 'septiembre', 10: 'octubre', 11: 'noviembre', 12: 'diciembre'
+        }
+        nombre_mes = meses[mes]
+        nombre_carpeta = f"{nombre_mes}_{str(anio)[-2:]}"
+
+        # Crear la carpeta si no existe
+        carpeta_mes = os.path.join(self.ruta_output, nombre_carpeta)
+        if not os.path.exists(carpeta_mes):
+            os.makedirs(carpeta_mes)
+            print(f"\nCarpeta creada: {carpeta_mes}")
+
+        # Copiar archivo original a la carpeta si se proporciona
+        if archivo_original and os.path.exists(archivo_original):
+            nombre_original = os.path.basename(archivo_original)
+            destino_original = os.path.join(carpeta_mes, nombre_original)
+            if not os.path.exists(destino_original):
+                shutil.copy2(archivo_original, destino_original)
+                print(f"OK Archivo original copiado a: {destino_original}")
+            else:
+                print(f"OK Archivo original ya existe en: {destino_original}")
+        else:
+            if archivo_original:
+                print(f"ADVERTENCIA: No se encontro el archivo original: {archivo_original}")
+            else:
+                print(f"ADVERTENCIA: No se proporciono archivo original para copiar")
+
+        # Generar nombre de archivo si no se especifica
+        if nombre_archivo is None:
+            nombre_archivo = f"movimientos_consolidados_{anio}_{mes:02d}.xlsx"
+
+        ruta_completa = os.path.join(carpeta_mes, nombre_archivo)
 
         print(f"\nExportando a: {ruta_completa}")
 
@@ -118,5 +161,6 @@ class Consolidator:
                     cell.number_format = '#,##0.00'
 
         print(f"OK Archivo exportado exitosamente ({len(df)} movimientos)")
+        print(f"Carpeta del período: {carpeta_mes}")
 
-        return ruta_completa
+        return ruta_completa, carpeta_mes

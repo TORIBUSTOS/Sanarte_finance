@@ -206,7 +206,7 @@ def proceso_completo():
         Prompt.ask("\n[dim]Presiona ENTER para continuar[/dim]")
         return
 
-    df_consolidado, archivo_consolidado = resultado
+    df_consolidado, archivo_consolidado, carpeta_mes = resultado
 
     console.print("\n[bold green]✅ Consolidación completada.[/bold green]")
     Prompt.ask("[dim]Presiona ENTER para continuar[/dim]")

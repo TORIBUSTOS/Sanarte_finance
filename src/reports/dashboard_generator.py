@@ -108,6 +108,29 @@ class DashboardGenerator:
             color: white;
             padding: 30px;
             text-align: center;
+            position: relative;
+        }}
+
+        .logo-container {{
+            display: flex;
+            justify-content: center;
+            margin-bottom: 15px;
+        }}
+
+        .toro-logo {{
+            width: 80px;
+            height: 80px;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
+            animation: logoFloat 3s ease-in-out infinite;
+        }}
+
+        @keyframes logoFloat {{
+            0%, 100% {{
+                transform: translateY(0px);
+            }}
+            50% {{
+                transform: translateY(-5px);
+            }}
         }}
 
         .header h1 {{
@@ -371,6 +394,43 @@ class DashboardGenerator:
 <body>
     <div class="container">
         <div class="header">
+            <div class="logo-container">
+                <svg class="toro-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Cabeza del toro -->
+                    <ellipse cx="50" cy="60" rx="25" ry="20" fill="#ffffff" opacity="0.95"/>
+
+                    <!-- Cuerno izquierdo -->
+                    <path d="M 30 50 Q 20 40 18 30 Q 17 25 20 23 Q 23 21 26 25 Q 30 32 32 45 Z"
+                          fill="#0ea5e9" stroke="#047857" stroke-width="1"/>
+
+                    <!-- Cuerno derecho -->
+                    <path d="M 70 50 Q 80 40 82 30 Q 83 25 80 23 Q 77 21 74 25 Q 70 32 68 45 Z"
+                          fill="#0ea5e9" stroke="#047857" stroke-width="1"/>
+
+                    <!-- Hocico -->
+                    <ellipse cx="50" cy="68" rx="15" ry="12" fill="#e8f5f1"/>
+
+                    <!-- Nariz -->
+                    <ellipse cx="50" cy="70" rx="8" ry="6" fill="#047857"/>
+                    <ellipse cx="47" cy="69" rx="2" ry="2" fill="#ffffff" opacity="0.6"/>
+                    <ellipse cx="53" cy="69" rx="2" ry="2" fill="#ffffff" opacity="0.6"/>
+
+                    <!-- Ojo izquierdo -->
+                    <circle cx="42" cy="58" r="3" fill="#047857"/>
+                    <circle cx="43" cy="57" r="1" fill="#ffffff"/>
+
+                    <!-- Ojo derecho -->
+                    <circle cx="58" cy="58" r="3" fill="#047857"/>
+                    <circle cx="59" cy="57" r="1" fill="#ffffff"/>
+
+                    <!-- Orejas -->
+                    <ellipse cx="30" cy="55" rx="5" ry="8" fill="#10b981" opacity="0.8"/>
+                    <ellipse cx="70" cy="55" rx="5" ry="8" fill="#10b981" opacity="0.8"/>
+
+                    <!-- Anillo nasal (detalle característico) -->
+                    <circle cx="50" cy="75" r="3" fill="none" stroke="#fbbf24" stroke-width="1.5"/>
+                </svg>
+            </div>
             <h1>TORO · Resumen de Cuentas</h1>
             <p>Generado el {fecha_generacion}</p>
         </div>
